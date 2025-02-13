@@ -14,7 +14,6 @@ fn main() {
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2d::default());
     commands.spawn((
-        #[warn(deprecated)]
         Sprite {
             color: Color::srgb(0.0, 0.0, 1.0),
             custom_size: Some(Vec2::new(20.0, 20.0)),
