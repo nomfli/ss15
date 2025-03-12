@@ -5,6 +5,8 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.15.1"
+bevy_renet = "1.0.0"
+bincode = "2.0.1"
 
 [profile.dev.package."*"]
 opt-level = 3
