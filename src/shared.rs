@@ -1,10 +1,13 @@
 use bevy::prelude::*;
-use bevy_renet::netcode::NetcodeTransportError;
 use bevy_renet::renet::ClientId;
-use serde::{Deserialize, Serialize};
+use serde::*;
 use std::collections::HashMap;
-#[derive(Debug, Default, Serialize, Deserialize, Component, Resource)]
-pub struct Input {
+pub const SERVER_ADDR: &str = "127.0.0.1:5000";
+pub const PROTOCOL_ID: u64 = 1;
+pub const PLAYER_MOVE_SPEED: f32 = 100.0;
+
+#[derive(Component, Debug, Default, Serialize, Deserialize, Resource)]
+pub struct PlayerInput {
     pub up: bool,
     pub down: bool,
     pub left: bool,
@@ -17,8 +20,8 @@ pub enum ServerMessages {
     PlayerDisconnected { id: ClientId },
 }
 
-#[derive(Debug, Component)]
-pub struct PlayerId {
+#[derive(Debug, Serialize, Deserialize, Component)]
+pub struct Player {
     pub id: ClientId,
 }
 
@@ -27,9 +30,6 @@ pub struct Lobby {
     pub players: HashMap<ClientId, Entity>,
 }
 
-#[allow(clippy::never_loop)]
-pub fn panic_on_error_system(mut renet_error: EventReader<NetcodeTransportError>) {
-    for e in renet_error.read() {
-        panic!("{}", e);
-    }
+pub fn startup(mut commands: Commands) {
+    commands.spawn(Camera2d { ..default() });
 }
