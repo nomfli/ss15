@@ -26,7 +26,6 @@ pub fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
 
 pub fn move_players_system(mut query: Query<(&mut Transform, &PlayerInput)>, time: Res<Time>) {
     for (mut transform, input) in query.iter_mut() {
-        println!("{:?}, {:?}", transform, input);
         if input.right {
             transform.translation.x += PLAYER_MOVE_SPEED * time.delta().as_secs_f32();
         }

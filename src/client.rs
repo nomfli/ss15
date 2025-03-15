@@ -42,7 +42,6 @@ pub fn player_input(
 pub fn client_send_input(player_input: Res<PlayerInput>, mut client: ResMut<RenetClient>) {
     let input_message = bincode::serialize(&*player_input).unwrap();
 
-    println!("{:?}", player_input);
     client.send_message(DefaultChannel::ReliableOrdered, input_message);
 }
 
