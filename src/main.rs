@@ -25,6 +25,8 @@ fn main() {
             app.insert_resource(server);
             app.insert_resource(transport);
             app.add_systems(Update, move_players_system);
+
+            app.add_systems(Update, velocity);
             app.add_systems(Update, server_sync_players);
             app.add_systems(Update, update_server_system);
         }

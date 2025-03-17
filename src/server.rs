@@ -24,19 +24,9 @@ pub fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     (server, transport)
 }
 
-pub fn move_players_system(
-    mut query: Query<(
-        &mut Transform,
-        &PlayerInput,
-        &MaxSpeed,
-        &Acceleration,
-        &mut Speed,
-    )>,
-    time: Res<Time>,
-) {
-    for (mut transform, input, max_speed, acceleration, mut speed) in query.iter_mut() {
+pub fn move_players_system(mut query: Query<(&PlayerInput, &Acceleration, &mut Speed)>) {
+    for (input, acceleration, mut speed) in query.iter_mut() {
         let mut dir = Vec2::new(0.0, 0.0);
-        let max_speed_value = max_speed.0;
         let acc_value = acceleration.0;
         if input.right {
             dir.x += 1.0;
@@ -56,8 +46,13 @@ pub fn move_players_system(
             speed.x += dir.x * acc_value;
             speed.y += dir.y * acc_value;
         }
+    }
+}
 
+pub fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSpeed, &mut Speed)>) {
+    for (mut transform, max_speed, mut speed) in query.iter_mut() {
         let speed_vec = Vec2::new(speed.x, speed.y);
+        let max_speed_value = max_speed.0;
         if speed_vec.length() > max_speed_value {
             let limited = speed_vec.normalize() * max_speed_value;
             speed.x = limited.x;
@@ -77,9 +72,9 @@ pub fn move_players_system(
 }
 
 pub fn server_sync_players(mut server: ResMut<RenetServer>, query: Query<(&Transform, &Player)>) {
-    let mut players: HashMap<ClientId, [f32; 3]> = HashMap::new();
+    let mut players: HashMap<ClientId, [f32; 2]> = HashMap::new();
     for (transform, player) in query.iter() {
-        players.insert(player.id, transform.translation.into());
+        players.insert(player.id, transform.translation.truncate().into());
     }
     let sync_message = bincode::serialize(&players).unwrap();
     server.broadcast_message(DefaultChannel::Unreliable, sync_message);
@@ -94,18 +89,7 @@ pub fn update_server_system(
     for event in server_events.read() {
         match event {
             ServerEvent::ClientConnected { client_id } => {
-                let player_entity_id = commands
-                    .spawn(Sprite {
-                        color: Color::srgb(255.0, 0.0, 0.0),
-                        custom_size: Some(Vec2::new(100.0, 100.0)),
-                        ..Default::default()
-                    })
-                    .insert(PlayerInput::default())
-                    .insert(Player { id: *client_id })
-                    .insert(Acceleration(ACCELERATION))
-                    .insert(MaxSpeed(MAX_MOVE_SPEED))
-                    .insert(Speed { x: 0.0, y: 0.0 })
-                    .id();
+                let player_entity_id = spawn_player_server(&mut commands, client_id);
                 lobby.players.insert(*client_id, player_entity_id);
 
                 for &player_id in lobby.players.keys() {
@@ -141,4 +125,19 @@ pub fn update_server_system(
             }
         }
     }
+}
+
+pub fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> Entity {
+    let ent = commands
+        .spawn(Sprite {
+            color: Color::srgb(255.0, 0.0, 0.0),
+            custom_size: Some(Vec2::new(100.0, 100.0)),
+            ..Default::default()
+        })
+        .insert(Player { id: *client_id })
+        .insert(Acceleration(ACCELERATION))
+        .insert(MaxSpeed(MAX_MOVE_SPEED))
+        .insert(Speed { x: 0.0, y: 0.0 })
+        .id();
+    ent
 }
