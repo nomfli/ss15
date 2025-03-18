@@ -5,15 +5,15 @@ use bevy_renet::renet::*;
 use std::collections::HashMap;
 use std::net::UdpSocket;
 use std::time::SystemTime;
-pub const TMP_ID: u64 = 1;
 
 pub fn new_renet_client() -> (RenetClient, NetcodeClientTransport) {
     let server_addr = SERVER_ADDR.parse().unwrap();
     let socket = UdpSocket::bind("0.0.0.0:0").unwrap();
+
     let current_time = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
         .unwrap();
-    let client_id = TMP_ID;
+    let client_id = rand::random::<u64>();
     let authentication = ClientAuthentication::Unsecure {
         client_id,
         protocol_id: PROTOCOL_ID,
@@ -76,8 +76,10 @@ pub fn client_sync_players(
         let players: HashMap<ClientId, [f32; 2]> = bincode::deserialize(&message).unwrap();
         for (player_id, transition) in players.iter() {
             if let Some(player_entity) = lobby.players.get(player_id) {
+                let [x, y] = *transition;
                 let transform = Transform {
-                    translation: Vec3::new((*transition)[0], (*transition)[1], 0.0),
+                    translation: Vec3::new(x, y, 0.0),
+
                     ..Default::default()
                 };
                 commands.entity(*player_entity).insert(transform);
