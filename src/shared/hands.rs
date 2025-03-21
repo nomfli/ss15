@@ -10,7 +10,7 @@ pub struct HandsCharacter {
     pub selected: usize,
 }
 
-#[derive(Component, Debug, Clone, Serialize, Deserialize, Copy)]
+#[derive(Component, Default, Debug, Clone, Serialize, Deserialize, Copy)]
 pub struct IAmGrabbed(pub bool);
 
 #[derive(Component, Default, Debug, Clone, Serialize, Deserialize, Copy)]

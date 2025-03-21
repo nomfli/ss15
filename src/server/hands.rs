@@ -13,27 +13,31 @@ pub fn change_hands(mut query: Query<(&PlayerInput, &mut HandsCharacter)>) {
 }
 
 pub fn grabb(
-    i_want_grabb: Query<(&PlayerInput, &HandsCharacter, &Transform)>,
+    i_want_grabb: Query<(&PlayerInput, &HandsCharacter, &Transform, Entity)>,
     mut i_wanna_be_grabed: Query<(&mut IAmGrabbed, &Transform, &SpriteName, Entity)>,
     data: Res<Data>,
+    mut commands: Commands,
 ) {
-    for (input, hand, trans) in i_want_grabb.iter() {
+    for (input, hand, trans, it_me) in i_want_grabb.iter() {
         let mut selected_hand: Box<Hand> = Box::new(hand.hands[hand.selected]);
         if input.left_mouse && selected_hand.grabbed_entity.is_none() {
-            for (mut i_am_grabbed, mut coords, name, ent) in i_wanna_be_grabed.iter_mut() {
-                if let Some(sprite) = data.sprite.get(&name.0) {
-                    let half_size = sprite.custom_size.unwrap_or(Vec2::new(128.0, 128.0)) * 0.5;
-                    let sprite_position = coords.translation.truncate();
-                    if let Some(cur_pos) = input.cursor_pos {
-                        if cur_pos.x >= sprite_position.x - half_size.x
-                            && cur_pos.x <= sprite_position.x + half_size.x
-                            && cur_pos.y >= sprite_position.y - half_size.y
-                            && cur_pos.y <= sprite_position.y + half_size.y
-                        {
-                            if (cur_pos - trans.translation.truncate()).length() < GRAB_RADIUS {
-                                i_am_grabbed.0 = true;
-                                selected_hand.grabbed_entity = Some(ent);
-                                coords = trans;
+            for (mut i_am_grabbed, coords, name, ent) in i_wanna_be_grabed.iter_mut() {
+                if it_me != ent {
+                    println!("{:?}", (i_am_grabbed.0, coords, name));
+                    if let Some(sprite) = data.sprite.get(&name.0) {
+                        let half_size = sprite.custom_size.unwrap_or(Vec2::new(128.0, 128.0)) * 0.5;
+                        let sprite_position = coords.translation.truncate();
+                        if let Some(cur_pos) = input.cursor_pos {
+                            if cur_pos.x >= sprite_position.x - half_size.x
+                                && cur_pos.x <= sprite_position.x + half_size.x
+                                && cur_pos.y >= sprite_position.y - half_size.y
+                                && cur_pos.y <= sprite_position.y + half_size.y
+                            {
+                                if (cur_pos - trans.translation.truncate()).length() < GRAB_RADIUS {
+                                    i_am_grabbed.0 = true;
+                                    selected_hand.grabbed_entity = Some(ent);
+                                    commands.entity(ent).remove::<Transform>();
+                                }
                             }
                         }
                     }

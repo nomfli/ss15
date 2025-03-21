@@ -21,6 +21,10 @@ fn main() {
     let mut app = App::new();
     app.add_plugins(DefaultPlugins);
     app.init_resource::<Lobby>();
+    app.insert_resource(Data {
+        sprite: HashMap::new(),
+    });
+    app.add_systems(Startup, init_data);
 
     match exec_type {
         "server" => {
@@ -31,14 +35,15 @@ fn main() {
             app.insert_resource(transport);
             app.add_systems(Update, move_players_system);
             app.add_systems(Update, velocity);
-            app.add_systems(Update, server_sync_players);
+            app.add_systems(Update, server_send_movement);
+            app.add_systems(Update, server_send_hands);
             app.add_systems(Update, update_server_system);
+            //            app.add_systems(Update, throw);
+            app.add_systems(Update, grabb);
+            app.add_systems(Update, change_hands);
         }
 
         "client" => {
-            app.insert_resource(Data {
-                sprite: HashMap::new(),
-            });
             app.add_plugins(RenetClientPlugin);
             app.add_plugins(NetcodeClientPlugin);
             let (client, transport) = new_renet_client();
@@ -46,10 +51,10 @@ fn main() {
             app.insert_resource(client);
             app.insert_resource(transport);
             app.add_systems(Startup, startup);
-            app.add_systems(Startup, init_data);
             app.add_systems(Update, player_input);
             app.add_systems(Update, client_send_input);
-            app.add_systems(Update, client_sync_players);
+            app.add_systems(Update, client_handler);
+            //  app.add_systems(Update, hands_client);
         }
 
         _ => panic!("incorrect usage"),

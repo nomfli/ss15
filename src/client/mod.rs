@@ -3,9 +3,10 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_renet::netcode::*;
 use bevy_renet::renet::*;
-use std::collections::HashMap;
 use std::net::UdpSocket;
 use std::time::SystemTime;
+
+use crate::shared::hands::*;
 
 pub mod init;
 
@@ -71,21 +72,21 @@ pub fn player_input(
 }
 
 pub fn client_send_input(player_input: Res<PlayerInput>, mut client: ResMut<RenetClient>) {
-    let input_message = bincode::serialize(&*player_input).unwrap();
-
-    client.send_message(DefaultChannel::ReliableOrdered, input_message);
+    if let Ok(input_message) = bincode::serialize(&*player_input) {
+        client.send_message(DefaultChannel::ReliableOrdered, input_message);
+    }
 }
 
-pub fn client_sync_players(
+pub fn client_handler(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
     data: Res<Data>,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
-        let server_message = bincode::deserialize(&message).unwrap();
+        let server_message = bincode::deserialize(&message);
         match server_message {
-            ServerMessages::PlayerConnected { id } => match data.sprite.get("red_sqr") {
+            Ok(ServerMessages::PlayerConnected { id }) => match data.sprite.get("red_sqr") {
                 Some(red_sqr) => {
                     let player_entity_id = commands.spawn(red_sqr.clone()).id();
                     lobby.players.insert(id, player_entity_id);
@@ -93,25 +94,59 @@ pub fn client_sync_players(
                 _ => {}
             },
 
-            ServerMessages::PlayerDisconnected { id } => {
+            Ok(ServerMessages::PlayerDisconnected { id }) => {
                 if let Some(player_entity) = lobby.players.remove(&id) {
                     commands.entity(player_entity).despawn();
                 }
             }
+
+            _ => {}
         }
     }
     while let Some(message) = client.receive_message(DefaultChannel::Unreliable) {
-        let players: HashMap<ClientId, [f32; 2]> = bincode::deserialize(&message).unwrap();
-        for (player_id, transition) in players.iter() {
-            if let Some(player_entity) = lobby.players.get(player_id) {
-                let [x, y] = *transition;
-                let transform = Transform {
-                    translation: Vec3::new(x, y, 0.0),
-
-                    ..Default::default()
-                };
-                commands.entity(*player_entity).insert(transform);
+        let server_message = bincode::deserialize(&message);
+        match server_message {
+            Ok(ServerMessages::ChangeTransform { cords_data }) => {
+                let players = cords_data;
+                for (player_id, transition) in players.iter() {
+                    if let Some(player_entity) = lobby.players.get(player_id) {
+                        let [x, y] = *transition;
+                        let transform = Transform {
+                            translation: Vec3::new(x, y, 0.0),
+                            ..Default::default()
+                        };
+                        commands.entity(*player_entity).insert(transform);
+                    }
+                }
             }
+            Ok(ServerMessages::ChangeHands { hands_data }) => {
+                println!("FUUUUUCK");
+                for (player_id, (hands, i_am_grabbed)) in hands_data.iter() {
+                    println!("{:?}, {:?}", hands, i_am_grabbed);
+                    if let Some(player_entity) = lobby.players.get(player_id) {
+                        commands
+                            .entity(*player_entity)
+                            .insert(hands.clone())
+                            .insert(*i_am_grabbed);
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
+pub fn hands_client(
+    query: Query<(&IAmGrabbed, &SpriteName, Entity)>,
+    mut commands: Commands,
+    data: Res<Data>,
+) {
+    for (i_am_grabbed, name, ent) in query.iter() {
+        if i_am_grabbed.0 {
+            commands.entity(ent).remove::<Sprite>();
+        } else {
+            let sprite = data.sprite[&name.0].clone();
+            commands.entity(ent).insert(sprite);
         }
     }
 }

@@ -1,3 +1,4 @@
+use crate::shared::hands::*;
 use bevy::prelude::*;
 use bevy_renet::renet::ClientId;
 use serde::*;
@@ -21,8 +22,18 @@ pub struct PlayerInput {
 
 #[derive(Debug, Serialize, Deserialize, Component)]
 pub enum ServerMessages {
-    PlayerConnected { id: ClientId },
-    PlayerDisconnected { id: ClientId },
+    PlayerConnected {
+        id: ClientId,
+    },
+    PlayerDisconnected {
+        id: ClientId,
+    },
+    ChangeTransform {
+        cords_data: HashMap<ClientId, [f32; 2]>,
+    },
+    ChangeHands {
+        hands_data: HashMap<ClientId, (HandsCharacter, IAmGrabbed)>,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize, Component)]

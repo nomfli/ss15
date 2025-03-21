@@ -1,4 +1,5 @@
 use crate::movement::*;
+use crate::shared::hands::*;
 use crate::shared::*;
 use bevy::prelude::*;
 use bevy_renet::netcode::*;
@@ -9,6 +10,7 @@ use std::time::SystemTime;
 
 pub mod hands;
 pub mod movement;
+
 pub fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     let public_addr = SERVER_ADDR.parse().unwrap();
     let socket = UdpSocket::bind(public_addr).unwrap();
@@ -27,13 +29,37 @@ pub fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     (server, transport)
 }
 
-pub fn server_sync_players(mut server: ResMut<RenetServer>, query: Query<(&Transform, &Player)>) {
-    let mut players: HashMap<ClientId, [f32; 2]> = HashMap::new();
+pub fn server_send_movement(mut server: ResMut<RenetServer>, query: Query<(&Transform, &Player)>) {
+    let cords_data: HashMap<ClientId, [f32; 2]> = HashMap::new();
+    let mut players = ServerMessages::ChangeTransform { cords_data };
+
     for (transform, player) in query.iter() {
-        players.insert(player.id, transform.translation.truncate().into());
+        if let ServerMessages::ChangeTransform { cords_data } = &mut players {
+            let cords: [f32; 2] = transform.translation.truncate().into();
+            cords_data.insert(player.id, cords);
+        }
     }
-    let sync_message = bincode::serialize(&players).unwrap();
-    server.broadcast_message(DefaultChannel::Unreliable, sync_message);
+
+    if let Ok(sync_message) = bincode::serialize(&players) {
+        server.broadcast_message(DefaultChannel::Unreliable, sync_message);
+    }
+}
+
+pub fn server_send_hands(
+    mut server: ResMut<RenetServer>,
+    query: Query<(&Player, &HandsCharacter, &IAmGrabbed)>,
+) {
+    let mut hands_char_data = ServerMessages::ChangeHands {
+        hands_data: HashMap::new(),
+    };
+    for (player, hands_char, i_am_grabbed) in query.iter() {
+        if let ServerMessages::ChangeHands { hands_data } = &mut hands_char_data {
+            hands_data.insert(player.id, (hands_char.clone(), i_am_grabbed.clone()));
+        }
+
+        let hand_message = bincode::serialize(&hands_char_data).unwrap();
+        server.broadcast_message(DefaultChannel::Unreliable, hand_message);
+    }
 }
 
 pub fn update_server_system(
@@ -46,6 +72,21 @@ pub fn update_server_system(
         match event {
             ServerEvent::ClientConnected { client_id } => {
                 let player_entity_id = spawn_player_server(&mut commands, client_id);
+                commands
+                    .entity(player_entity_id)
+                    .insert(IAmGrabbed(false))
+                    .insert(HandsCharacter {
+                        selected: 0,
+                        hands: vec![
+                            Hand {
+                                grabbed_entity: None,
+                            },
+                            Hand {
+                                grabbed_entity: None,
+                            },
+                        ],
+                    })
+                    .insert(SpriteName("red_sqr".to_string()));
                 lobby.players.insert(*client_id, player_entity_id);
 
                 for &player_id in lobby.players.keys() {
