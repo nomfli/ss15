@@ -90,10 +90,33 @@ pub fn update_server_system(
                 lobby.players.insert(*client_id, player_entity_id);
 
                 for &player_id in lobby.players.keys() {
-                    let message =
+                    let message_about_old_connected =
                         bincode::serialize(&ServerMessages::PlayerConnected { id: player_id })
                             .unwrap();
-                    server.send_message(*client_id, DefaultChannel::ReliableOrdered, message);
+
+                    println!(
+                        "send_to {:?}, send about {:?}",
+                        player_id, message_about_old_connected
+                    );
+                    server.send_message(
+                        *client_id,
+                        DefaultChannel::ReliableOrdered,
+                        message_about_old_connected,
+                    );
+                    if player_id != *client_id {
+                        let message_about_new_connected =
+                            bincode::serialize(&ServerMessages::PlayerConnected { id: *client_id });
+                        match message_about_new_connected {
+                            Ok(msg) => {
+                                server.send_message(
+                                    player_id,
+                                    DefaultChannel::ReliableOrdered,
+                                    msg,
+                                );
+                            }
+                            Err(_) => {}
+                        }
+                    }
                 }
             }
             ServerEvent::ClientDisconnected {

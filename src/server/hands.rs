@@ -23,7 +23,6 @@ pub fn grabb(
         if input.left_mouse && selected_hand.grabbed_entity.is_none() {
             for (mut i_am_grabbed, coords, name, ent) in i_wanna_be_grabed.iter_mut() {
                 if it_me != ent {
-                    println!("{:?}", (i_am_grabbed.0, coords, name));
                     if let Some(sprite) = data.sprite.get(&name.0) {
                         let half_size = sprite.custom_size.unwrap_or(Vec2::new(128.0, 128.0)) * 0.5;
                         let sprite_position = coords.translation.truncate();
