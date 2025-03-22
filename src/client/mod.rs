@@ -120,9 +120,7 @@ pub fn client_handler(
                 }
             }
             Ok(ServerMessages::ChangeHands { hands_data }) => {
-                println!("FUUUUUCK");
                 for (player_id, (hands, i_am_grabbed)) in hands_data.iter() {
-                    println!("{:?}, {:?}", hands, i_am_grabbed);
                     if let Some(player_entity) = lobby.players.get(player_id) {
                         commands
                             .entity(*player_entity)
