@@ -88,7 +88,10 @@ pub fn client_handler(
         match server_message {
             Ok(ServerMessages::PlayerConnected { id }) => match data.sprite.get("red_sqr") {
                 Some(red_sqr) => {
-                    let player_entity_id = commands.spawn(red_sqr.clone()).id();
+                    let player_entity_id = commands
+                        .spawn(red_sqr.clone())
+                        .insert(SpriteName("red_sqr".to_string()))
+                        .id();
                     lobby.players.insert(id, player_entity_id);
                 }
                 _ => {}

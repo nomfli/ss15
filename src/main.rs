@@ -38,7 +38,7 @@ fn main() {
             app.add_systems(Update, server_send_movement);
             app.add_systems(Update, server_send_hands);
             app.add_systems(Update, update_server_system);
-            //            app.add_systems(Update, throw);
+            app.add_systems(Update, throw);
             app.add_systems(Update, grabb);
             app.add_systems(Update, change_hands);
         }
@@ -54,7 +54,7 @@ fn main() {
             app.add_systems(Update, player_input);
             app.add_systems(Update, client_send_input);
             app.add_systems(Update, client_handler);
-            //  app.add_systems(Update, hands_client);
+            app.add_systems(Update, hands_client);
         }
 
         _ => panic!("incorrect usage"),

@@ -94,10 +94,6 @@ pub fn update_server_system(
                         bincode::serialize(&ServerMessages::PlayerConnected { id: player_id })
                             .unwrap();
 
-                    println!(
-                        "send_to {:?}, send about {:?}",
-                        player_id, message_about_old_connected
-                    );
                     server.send_message(
                         *client_id,
                         DefaultChannel::ReliableOrdered,

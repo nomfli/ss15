@@ -2,7 +2,7 @@ use crate::shared::hands::*;
 use crate::shared::*;
 use bevy::prelude::*;
 
-pub const GRAB_RADIUS: f32 = 100.0;
+pub const GRAB_RADIUS: f32 = 10000000.0; //change in future
 
 pub fn change_hands(mut query: Query<(&PlayerInput, &mut HandsCharacter)>) {
     for (input, mut hand) in query.iter_mut() {
@@ -13,13 +13,15 @@ pub fn change_hands(mut query: Query<(&PlayerInput, &mut HandsCharacter)>) {
 }
 
 pub fn grabb(
-    i_want_grabb: Query<(&PlayerInput, &HandsCharacter, &Transform, Entity)>,
+    mut i_want_grabb: Query<(&PlayerInput, &mut HandsCharacter, &Transform, Entity)>,
     mut i_wanna_be_grabed: Query<(&mut IAmGrabbed, &Transform, &SpriteName, Entity)>,
     data: Res<Data>,
     mut commands: Commands,
 ) {
-    for (input, hand, trans, it_me) in i_want_grabb.iter() {
-        let mut selected_hand: Box<Hand> = Box::new(hand.hands[hand.selected]);
+    for (input, mut hand, trans, it_me) in i_want_grabb.iter_mut() {
+        let selected_idx = hand.selected;
+        let selected_hand = &mut hand.hands[selected_idx];
+
         if input.left_mouse && selected_hand.grabbed_entity.is_none() {
             for (mut i_am_grabbed, coords, name, ent) in i_wanna_be_grabed.iter_mut() {
                 if it_me != ent {
@@ -47,33 +49,46 @@ pub fn grabb(
 }
 
 pub fn throw(
-    mut i_want_throw: Query<(&PlayerInput, &mut HandsCharacter, &Transform)>,
-    mut i_am_grabbed_query: Query<(&mut IAmGrabbed, &mut Transform)>,
+    mut query: Query<(&PlayerInput, &mut HandsCharacter, &Transform)>,
+    mut commands: Commands,
 ) {
-    for (input, hand, transform) in i_want_throw.iter_mut() {
-        let mut selected_hand: Box<Hand> = Box::new(hand.hands[hand.selected]);
-        if input.throw && selected_hand.grabbed_entity.is_some() {
-            if let Some(cur_pos) = input.cursor_pos {
-                if let Some(grabbed_ent) = selected_hand.grabbed_entity {
-                    if let Ok((mut i_am_grabbed, mut position)) =
-                        i_am_grabbed_query.get_mut(grabbed_ent)
-                    {
-                        let distance = cur_pos - transform.translation.truncate();
+    let mut we_will_be_droped: Vec<(Entity, Vec3)> = Vec::new();
 
-                        if distance.length() < GRAB_RADIUS {
-                            i_am_grabbed.0 = false;
-                            position.translation = Vec3::new(cur_pos.x, cur_pos.y, 0.0);
-                            (*selected_hand).grabbed_entity = None;
-                        } else {
-                            let throw_dir = distance.normalize();
-                            let throw_pos =
-                                transform.translation.truncate() + throw_dir * GRAB_RADIUS;
-                            i_am_grabbed.0 = false;
-                            position.translation = Vec3::new(throw_pos.x, throw_pos.y, 0.0);
-                        }
-                    }
-                }
-            }
+    for (input, mut hand, transform) in query.iter_mut() {
+        let selected_idx = hand.selected;
+        let selected_hand = &mut hand.hands[selected_idx];
+
+        if !input.throw {
+            continue;
         }
+        let Some(cur_pos) = input.cursor_pos else {
+            continue;
+        };
+
+        let Some(grabbed_ent) = selected_hand.grabbed_entity else {
+            continue;
+        };
+
+        let distance = cur_pos - transform.translation.truncate();
+
+        let drop_pos: Vec3;
+        if distance.length() < GRAB_RADIUS {
+            drop_pos = Vec3::new(cur_pos.x, cur_pos.y, 0.0);
+            selected_hand.grabbed_entity = None;
+        } else {
+            let throw_dir = distance.normalize();
+            let throw_pos = transform.translation.truncate() + throw_dir * GRAB_RADIUS;
+            drop_pos = Vec3::new(throw_pos.x, throw_pos.y, 0.0);
+        }
+        we_will_be_droped.push((grabbed_ent, drop_pos));
+    }
+    for (ent, drop_pos) in we_will_be_droped {
+        commands
+            .entity(ent)
+            .insert(Transform {
+                translation: drop_pos,
+                ..Default::default()
+            })
+            .insert(IAmGrabbed(false));
     }
 }

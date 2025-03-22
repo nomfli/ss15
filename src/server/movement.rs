@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 pub const MAX_MOVE_SPEED: f32 = 1000.0;
 pub const ACCELERATION: f32 = 100.0;
-pub const FRICTION: f32 = 0.90;
+pub const FRICTION: f32 = 0.9;
 
 #[derive(Component, Debug, Default, Serialize, Deserialize)]
 pub struct MaxSpeed(pub f32);
