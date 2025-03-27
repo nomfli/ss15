@@ -58,6 +58,9 @@ pub fn try_to_grabb(
             continue;
         }
         for (coords, sprite, ent, grabbable) in can_be_grabbed.iter() {
+            if !grabbable.0 {
+                continue;
+            }
             let half_size = sprite.custom_size.unwrap_or(Vec2::new(128.0, 128.0)) * 0.5;
             let sprite_position = coords.translation.truncate();
             let Some(cur_pos) = mouse_input.cords else {
