@@ -29,3 +29,6 @@ pub struct Hands {
     pub all_hands: Vec<Hand>,
     pub selected_hand: usize,
 }
+
+#[derive(Clone, Copy, Default, Debug, Component, Serialize, Deserialize)]
+pub struct Grabbable(pub bool);

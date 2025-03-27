@@ -1,4 +1,7 @@
-use crate::shared::components::{PROTOCOL_ID, SERVER_ADDR};
+use crate::shared::{
+    components::{Grabbable, PROTOCOL_ID, SERVER_ADDR},
+    sprites::{SpriteName, Sprites},
+};
 use bevy::prelude::*;
 use bevy_renet::netcode::*;
 use bevy_renet::renet::*;
@@ -15,6 +18,7 @@ impl Plugin for ServerInitPlug {
         app.insert_resource(transport);
         app.add_plugins(RenetServerPlugin);
         app.add_plugins(NetcodeServerPlugin);
+        app.add_systems(Startup, init);
     }
 }
 
@@ -34,4 +38,19 @@ pub fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     let transport = NetcodeServerTransport::new(server_config, socket).unwrap();
     let server = RenetServer::new(ConnectionConfig::default());
     (server, transport)
+}
+
+pub fn init(sprites: Res<Sprites>, mut commands: Commands) {
+    let name = "blue_sqr".to_string();
+    let Some(sprite) = sprites.0.get(&name) else {
+        panic!()
+    };
+    commands
+        .spawn(sprite.clone())
+        .insert(SpriteName(name))
+        .insert(Transform {
+            translation: Vec3::new(0.0, 0.0, 0.0),
+            ..Default::default()
+        })
+        .insert(Grabbable(true));
 }

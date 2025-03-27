@@ -1,8 +1,9 @@
-use crate::client::hands::ShouldGrabb;
+use crate::client::hands::{ClientThrowEvent, ShouldGrabb};
 use crate::shared::{
-    components::{Hand, Hands, PlayerEntity, ServerEntityId},
+    components::{Grabbable, Hand, Hands, PlayerEntity, ServerEntityId},
     messages::ServerMessages,
     resource::Lobby,
+    sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
 use bevy_renet::netcode::NetcodeClientTransport;
@@ -20,14 +21,16 @@ pub fn client_sync_players(
     mut client: ResMut<RenetClient>,
     client_transport: Res<NetcodeClientTransport>,
     mut lobby: ResMut<Lobby>,
+    sprites: Res<Sprites>,
     mut grab_event: EventWriter<ShouldGrabb>,
+    mut throw_ev: EventWriter<ClientThrowEvent>,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
         match server_message {
             ServerMessages::PlayerConnected { client_id, ent_id } => {
                 let this_client_id = client_transport.client_id();
-                let player_entity_id = spawn_player_client(&mut commands, ent_id);
+                let player_entity_id = spawn_player_client(&mut commands, ent_id, &sprites);
 
                 if this_client_id == client_id {
                     commands.entity(player_entity_id).insert(PlayerEntity);
@@ -57,10 +60,32 @@ pub fn client_sync_players(
                     }
                 }
             }
+            Ok(ServerMessages::SendItem(item)) => {
+                let ([x, y], name, ent, grabbable) = item;
+                let Some(sprite) = sprites.0.get(&name.0) else {
+                    continue;
+                };
+                commands
+                    .spawn(Transform {
+                        translation: Vec3::new(x, y, 0.0),
+                        ..Default::default()
+                    })
+                    .insert(SpriteName(name.0))
+                    .insert(ServerEntityId { ent_id: ent })
+                    .insert(Grabbable(grabbable.0))
+                    .insert(sprite.clone());
+            }
             Ok(ServerMessages::GrabAnswer(ent, id)) => {
                 grab_event.send(ShouldGrabb {
                     i_must_be_grabbed: ent,
                     who_should_grabe: id,
+                });
+            }
+            Ok(ServerMessages::ThrowAnswer(ent, client_id, where_throw)) => {
+                throw_ev.send(ClientThrowEvent {
+                    i_want_freedom: ent,
+                    client_id,
+                    where_throw,
                 });
             }
             _ => {}
@@ -68,27 +93,28 @@ pub fn client_sync_players(
     }
 }
 
-fn spawn_player_client(commands: &mut Commands, ent_id: Entity) -> Entity {
-    let player_entity_id = commands
-        .spawn(Sprite {
-            custom_size: Some(Vec2::new(100.0, 100.0)),
-            color: Color::srgb(255.0, 0.0, 0.0),
-            ..Default::default()
-        })
-        .insert(Hands {
-            all_hands: vec![
-                Hand {
-                    grabb_ent: None,
-                    hand_len: 100000.0,
-                },
-                Hand {
-                    grabb_ent: None,
-                    hand_len: 100000.0,
-                },
-            ],
-            selected_hand: 0,
-        })
-        .insert(ServerEntityId { ent_id })
-        .id();
-    player_entity_id
+fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sprites>) -> Entity {
+    if let Some(sprite) = sprites.0.get("red_sqr") {
+        let player_entity_id = commands
+            .spawn(SpriteName("red_sqr".to_string()))
+            .insert(sprite.clone())
+            .insert(Hands {
+                all_hands: vec![
+                    Hand {
+                        grabb_ent: None,
+                        hand_len: 100000.0,
+                    },
+                    Hand {
+                        grabb_ent: None,
+                        hand_len: 100000.0,
+                    },
+                ],
+                selected_hand: 0,
+            })
+            .insert(ServerEntityId { ent_id })
+            .id();
+        player_entity_id
+    } else {
+        panic!("BAD DATA!"); //idk what entity i need to return here
+    }
 }

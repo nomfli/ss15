@@ -1,3 +1,4 @@
+pub mod connection;
 pub mod hands;
 pub mod init;
 pub mod movement;

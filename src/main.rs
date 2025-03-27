@@ -9,16 +9,16 @@ use crate::client::{
     movement::MovementClientPlug, sync_players::ClientSyncPlayersPlug,
 };
 use crate::server::{
-    hands::HandsServerPlug, init::ServerInitPlug, movement::MovementServerPlug,
-    update_server_system::UpdateServerPlug,
+    connection::ConnectionHandlerPlug, hands::HandsServerPlug, init::ServerInitPlug,
+    movement::MovementServerPlug, update_server_system::UpdateServerPlug,
 };
-use crate::shared::resource::ResInitPlug;
+use crate::shared::{resource::ResInitPlug, sprites::SpritesPlug};
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let exec_type = (&args[1]).as_str();
     let mut app = App::new();
-    app.add_plugins((DefaultPlugins, ResInitPlug));
+    app.add_plugins((DefaultPlugins, ResInitPlug, SpritesPlug));
 
     match exec_type {
         "server" => {
@@ -27,6 +27,7 @@ fn main() {
                 ServerInitPlug,
                 MovementServerPlug,
                 UpdateServerPlug,
+                ConnectionHandlerPlug,
             ));
         }
 
