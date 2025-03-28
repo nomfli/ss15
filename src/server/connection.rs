@@ -14,8 +14,6 @@ impl Plugin for ConnectionHandlerPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, client_connection_handler);
         app.add_event::<SendPlayerConnection>();
-        app.add_event::<SendItems>();
-        app.add_systems(Update, send_items);
     }
 }
 
@@ -101,27 +99,4 @@ pub fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> Entity {
         })
         .id();
     ent
-}
-
-pub fn send_items(
-    mut send_item: EventReader<SendItems>,
-    items: Query<(&Transform, &SpriteName, Entity, &Grabbable), Without<Player>>,
-    mut server: ResMut<RenetServer>,
-) {
-    for event in send_item.read() {
-        for item in items.iter() {
-            let (trans, name, ent, grabbable) = item;
-            let Vec2 { x, y } = trans.translation.truncate();
-            let item_msg = bincode::serialize(&ServerMessages::SendItem((
-                [x, y],
-                name.clone(),
-                ent,
-                *grabbable,
-            )));
-
-            if let Ok(msg) = item_msg {
-                server.send_message(event.client_id, DefaultChannel::Unreliable, msg)
-            }
-        }
-    }
 }

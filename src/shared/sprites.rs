@@ -23,7 +23,7 @@ pub fn init_sprites(mut sprites: ResMut<Sprites>) {
         red_sqr,
         Sprite {
             custom_size: Some(Vec2::new(100.0, 100.0)),
-            color: Color::srgb(255.0, 0.0, 0.0),
+            color: Color::srgb_u8(255, 0, 0),
             ..Default::default()
         },
     );
@@ -32,7 +32,7 @@ pub fn init_sprites(mut sprites: ResMut<Sprites>) {
         blue_sqr,
         Sprite {
             custom_size: Some(Vec2::new(100.0, 100.0)),
-            color: Color::srgb(0.0, 0.0, 255.0),
+            color: Color::srgb_u8(0, 0, 255),
             ..Default::default()
         },
     );
