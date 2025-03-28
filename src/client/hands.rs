@@ -53,8 +53,6 @@ pub fn try_to_grabb(
     mut client: ResMut<RenetClient>,
 ) {
     for (hand, _) in i_want_grabb.iter() {
-        print!("IWASHERE");
-
         let selected_idx = hand.selected_hand;
         if hand.all_hands[selected_idx].grabb_ent.is_some() {
             continue;

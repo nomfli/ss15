@@ -115,6 +115,6 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
             .id();
         player_entity_id
     } else {
-        panic!("BAD DATA!"); //idk what entity i need to return here
+        panic!("Missing sprite 'red_sqr' for entity ID {:?}", ent_id);
     }
 }
