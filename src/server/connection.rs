@@ -1,9 +1,8 @@
 use crate::server::movement::*;
 use crate::shared::{
-    components::{Grabbable, Hand, Hands, Player},
+    components::{Hand, Hands, Player},
     messages::ServerMessages,
     resource::Lobby,
-    sprites::SpriteName,
 };
 use bevy::prelude::*;
 use bevy_renet::renet::*;
@@ -19,11 +18,6 @@ impl Plugin for ConnectionHandlerPlug {
 
 #[derive(Event)]
 pub struct SendPlayerConnection {
-    pub client_id: u64,
-}
-
-#[derive(Event)]
-pub struct SendItems {
     pub client_id: u64,
 }
 
