@@ -41,7 +41,6 @@ pub fn connections_handler(
                 if let Some(player_entity) = lobby.players.remove(client_id) {
                     commands.entity(player_entity).despawn();
                 }
-                lobby.players.remove(client_id);
                 let message =
                     bincode::serialize(&ServerMessages::PlayerDisconnected { id: *client_id })
                         .unwrap();
