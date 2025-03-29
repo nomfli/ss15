@@ -15,10 +15,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
     - name: Install dependencies
       run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
-    - name: Build and Test
+
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+
+    - name: Cache Rust dependencies
+      uses: Swatinem/rust-cache@v2
+
+    - name: Clippy
+      run: cargo clippy --verbose -- -D warnings
+
+    - name: Build
       run: cargo rustc --verbose -- -D warnings
+
+
     - name: Run tests
       run: cargo test --verbose
