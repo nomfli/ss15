@@ -11,7 +11,6 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -22,21 +21,28 @@ jobs:
       run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
 
     - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
+      run: rustup toolchain install stable --profile minimal
+
+    - name: Cache Rust dependencies
+      uses: Swatinem/rust-cache@v2
+
+    - name: Build
+      run: cargo rustc -- -D warnings
+
+    - name: Run tests
+      run: cargo test
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install Rust toolchain with clippy
+      run: |
+        rustup toolchain install stable --profile minimal --component clippy
+        rustup default stable
 
     - name: Cache Rust dependencies
       uses: Swatinem/rust-cache@v2
 
     - name: Clippy
-      run: cargo clippy --verbose -- -D warnings
-
-    - name: Build
-      run: cargo rustc --verbose -- -D warnings
-
-
-    - name: Run tests
-      run: cargo test --verbose
+      run: cargo clippy -- -D warnings
