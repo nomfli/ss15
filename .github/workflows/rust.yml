@@ -11,14 +11,44 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
     - name: Install dependencies
       run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
-    - name: Build and Test
-      run: cargo rustc --verbose -- -D warnings
+
+    - name: Install Rust toolchain
+      run: rustup toolchain install stable --profile minimal
+
+    - name: Cache Rust dependencies
+      uses: Swatinem/rust-cache@v2
+
+    - name: Build
+      run: cargo rustc -- -D warnings
+
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
+
+    - name: Install Rust toolchain with clippy
+      run: |
+        rustup toolchain install stable --profile minimal --component clippy
+        rustup default stable
+
+    - name: Cache Rust dependencies
+      uses: Swatinem/rust-cache@v2
+
+    - name: Clippy
+      run: cargo clippy -- -D warnings

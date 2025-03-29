@@ -43,5 +43,5 @@ pub struct Lobby {
 }
 
 pub fn startup(mut commands: Commands) {
-    commands.spawn(Camera2d { ..default() });
+    commands.spawn(Camera2d {});
 }
