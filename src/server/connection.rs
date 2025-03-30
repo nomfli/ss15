@@ -64,11 +64,8 @@ pub fn client_connection_handler(
                         client_id: *client_id,
                         ent_id: *server_ent,
                     });
-                match message_about_new_connected {
-                    Ok(msg) => {
-                        server.send_message(player_id, DefaultChannel::ReliableOrdered, msg);
-                    }
-                    Err(_) => {}
+                if let Ok(msg) = message_about_new_connected {
+                    server.send_message(player_id, DefaultChannel::ReliableOrdered, msg);
                 }
             }
         }
