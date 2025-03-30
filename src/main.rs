@@ -16,7 +16,7 @@ use crate::shared::{resource::ResInitPlug, sprites::SpritesPlug};
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let exec_type = (&args[1]).as_str();
+    let exec_type = args[1].as_str();
     let mut app = App::new();
     app.add_plugins((DefaultPlugins, ResInitPlug, SpritesPlug));
 
