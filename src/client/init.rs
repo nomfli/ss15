@@ -37,5 +37,5 @@ pub fn new_renet_client() -> (RenetClient, NetcodeClientTransport) {
 }
 
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2d { ..default() });
+    commands.spawn(Camera2d {});
 }
