@@ -96,7 +96,7 @@ pub(crate) fn send_items(
         for item in items.iter() {
             let (trans, name, ent, grabbable) = item;
             let Vec2 { x, y } = trans.translation.truncate();
-            let item_msg = bincode::serialize(&ServerMessages::SendItem((
+            let item_msg = bincode::serialize(&ServerMessages::AddItem((
                 [x, y],
                 name.clone(),
                 ent,
