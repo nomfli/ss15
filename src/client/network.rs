@@ -11,11 +11,11 @@ pub struct ClientSyncPlayersPlug;
 
 impl Plugin for ClientSyncPlayersPlug {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, client_sync_players);
+        app.add_systems(Update, receive_message);
     }
 }
 
-pub(crate) fn client_sync_players(
+pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     client_transport: Res<NetcodeClientTransport>,
@@ -57,7 +57,7 @@ pub(crate) fn client_sync_players(
                     }
                 }
             }
-            Ok(ServerMessages::SendItem(item)) => {
+            Ok(ServerMessages::AddItem(item)) => {
                 let ([x, y], name, _ent, grabbable) = item;
                 let Some(sprite) = sprites.0.get(&name.0) else {
                     continue;

@@ -9,7 +9,7 @@ pub enum ServerMessages {
     PlayerConnected { client_id: ClientId, ent_id: Entity },
     PlayerDisconnected { id: ClientId },
     SendPositions(HashMap<ClientId, [f32; 2]>),
-    SendItem(([f32; 2], SpriteName, Entity, Grabbable)),
+    AddItem(([f32; 2], SpriteName, Entity, Grabbable)),
 }
 
 #[derive(Debug, Serialize, Deserialize, Component)]

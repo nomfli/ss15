@@ -6,7 +6,7 @@ mod shared;
 
 use crate::client::{
     init::ClientInitPlug, input::InputClientPlug, movement::MovementClientPlug,
-    sync_players::ClientSyncPlayersPlug,
+    network::ClientSyncPlayersPlug,
 };
 use crate::server::{
     connection::ConnectionHandlerPlug, init::ServerInitPlug, movement::MovementServerPlug,
