@@ -47,16 +47,19 @@ pub(crate) fn receive_message(
         match bincode::deserialize(&message) {
             Ok(ServerMessages::SendPositions(players)) => {
                 for (player_id, transition) in players.iter() {
-                    if let Some(player_entity) = lobby.players.get(player_id) {
-                        let [x, y] = *transition;
-                        let transform = Transform {
-                            translation: Vec3::new(x, y, 0.0),
-                            ..Default::default()
-                        };
-                        commands.entity(*player_entity).insert(transform);
-                    }
+                    let Some(player_entity) = lobby.players.get(player_id) else {
+                        continue;
+                    };
+
+                    let [x, y] = *transition;
+                    let transform = Transform {
+                        translation: Vec3::new(x, y, 0.0),
+                        ..Default::default()
+                    };
+                    commands.entity(*player_entity).insert(transform);
                 }
             }
+
             Ok(ServerMessages::AddItem(item)) => {
                 let ([x, y], name, _ent, grabbable) = item;
                 let Some(sprite) = sprites.0.get(&name.0) else {
