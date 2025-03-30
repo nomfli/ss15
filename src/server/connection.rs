@@ -20,16 +20,16 @@ impl Plugin for ConnectionHandlerPlug {
 }
 
 #[derive(Event)]
-pub struct SendPlayerConnection {
+pub(crate) struct SendPlayerConnection {
     pub client_id: u64,
 }
 
 #[derive(Event)]
-pub struct SendItems {
+pub(crate) struct SendItems {
     pub client_id: u64,
 }
 
-pub fn client_connection_handler(
+pub(crate) fn client_connection_handler(
     mut client_connected: EventReader<SendPlayerConnection>,
     mut lobby: ResMut<Lobby>,
     mut commands: Commands,
@@ -72,7 +72,7 @@ pub fn client_connection_handler(
     }
 }
 
-pub fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> Entity {
+pub(crate) fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> Entity {
     let ent = commands
         .spawn(Sprite {
             color: Color::srgb(255.0, 0.0, 0.0),
@@ -87,7 +87,7 @@ pub fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> Entity {
     ent
 }
 
-pub fn send_items(
+pub(crate) fn send_items(
     mut send_item: EventReader<SendItems>,
     items: Query<(&Transform, &SpriteName, Entity, &Grabbable), Without<Player>>,
     mut server: ResMut<RenetServer>,

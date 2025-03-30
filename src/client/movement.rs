@@ -10,7 +10,10 @@ impl Plugin for MovementClientPlug {
     }
 }
 
-pub fn client_send_movement(player_input: Res<MovementInput>, mut client: ResMut<RenetClient>) {
+pub(crate) fn client_send_movement(
+    player_input: Res<MovementInput>,
+    mut client: ResMut<RenetClient>,
+) {
     if let Ok(input_message) = bincode::serialize(&ClientMessages::MovementInput {
         up: player_input.up,
         down: player_input.down,

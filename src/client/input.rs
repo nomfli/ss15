@@ -8,7 +8,7 @@ impl Plugin for InputClientPlug {
     }
 }
 
-pub fn movement_input(
+pub(crate) fn movement_input(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut player_input: ResMut<MovementInput>,
 ) {

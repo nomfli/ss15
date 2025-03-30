@@ -15,7 +15,7 @@ impl Plugin for ClientSyncPlayersPlug {
     }
 }
 
-pub fn client_sync_players(
+pub(crate) fn client_sync_players(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     client_transport: Res<NetcodeClientTransport>,

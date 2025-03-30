@@ -4,22 +4,22 @@ use bevy_renet::renet::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub const MAX_MOVE_SPEED: f32 = 1000.0;
-pub const ACCELERATION: f32 = 100.0;
+pub(crate) const MAX_MOVE_SPEED: f32 = 1000.0;
+pub(crate) const ACCELERATION: f32 = 100.0;
 
 #[derive(Component, Debug, Default, Serialize, Deserialize)]
-pub struct Speed {
+pub(crate) struct Speed {
     pub x: f32,
     pub y: f32,
 }
 
 #[derive(Component, Debug, Default, Serialize, Deserialize)]
-pub struct MaxSpeed(pub f32);
+pub(crate) struct MaxSpeed(pub f32);
 
 #[derive(Component, Debug, Default, Serialize, Deserialize)]
-pub struct Acceleration(pub f32);
+pub(crate) struct Acceleration(pub f32);
 
-pub struct MovementServerPlug;
+pub(crate) struct MovementServerPlug;
 
 impl Plugin for MovementServerPlug {
     fn build(&self, app: &mut App) {
@@ -29,7 +29,7 @@ impl Plugin for MovementServerPlug {
     }
 }
 
-pub fn move_players_system(mut query: Query<(&MovementInput, &Acceleration, &mut Speed)>) {
+pub(crate) fn move_players_system(mut query: Query<(&MovementInput, &Acceleration, &mut Speed)>) {
     for (input, acceleration, mut speed) in query.iter_mut() {
         let mut dir = Vec2::new(0.0, 0.0);
         let acc_value = acceleration.0;
@@ -54,7 +54,7 @@ pub fn move_players_system(mut query: Query<(&MovementInput, &Acceleration, &mut
     }
 }
 
-pub fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSpeed, &mut Speed)>) {
+pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSpeed, &mut Speed)>) {
     for (mut transform, max_speed, mut speed) in query.iter_mut() {
         let speed_vec = Vec2::new(speed.x, speed.y);
         let max_speed_value = max_speed.0;
@@ -76,7 +76,7 @@ pub fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSpeed, &m
     }
 }
 
-pub fn server_sync_players_movement(
+pub(crate) fn server_sync_players_movement(
     mut server: ResMut<RenetServer>,
     query: Query<(&Transform, &Player)>,
 ) {

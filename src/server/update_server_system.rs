@@ -15,7 +15,7 @@ impl Plugin for UpdateServerPlug {
     }
 }
 
-pub fn connections_handler(
+pub(crate) fn connections_handler(
     mut server_events: EventReader<ServerEvent>,
     mut client_connected: EventWriter<SendPlayerConnection>,
     mut send_items: EventWriter<SendItems>,
@@ -50,7 +50,11 @@ pub fn connections_handler(
     }
 }
 
-fn message_handler(mut commands: Commands, lobby: Res<Lobby>, mut server: ResMut<RenetServer>) {
+pub(crate) fn message_handler(
+    mut commands: Commands,
+    lobby: Res<Lobby>,
+    mut server: ResMut<RenetServer>,
+) {
     for client_id in server.clients_id() {
         while let Some(message) = server.receive_message(client_id, DefaultChannel::Unreliable) {
             let client_msg = bincode::deserialize(&message);
