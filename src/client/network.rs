@@ -1,3 +1,4 @@
+use crate::client::movement::ChangePositions;
 use crate::shared::{
     components::{Grabbable, PlayerEntity},
     messages::ServerMessages,
@@ -7,8 +8,8 @@ use crate::shared::{
 use bevy::prelude::*;
 use bevy_renet::netcode::NetcodeClientTransport;
 use bevy_renet::renet::*;
-pub struct ClientSyncPlayersPlug;
 
+pub struct ClientSyncPlayersPlug;
 impl Plugin for ClientSyncPlayersPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, receive_message);
@@ -21,6 +22,7 @@ pub(crate) fn receive_message(
     client_transport: Res<NetcodeClientTransport>,
     mut lobby: ResMut<Lobby>,
     sprites: Res<Sprites>,
+    mut change_pos_ev: EventWriter<ChangePositions>,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -28,7 +30,6 @@ pub(crate) fn receive_message(
             ServerMessages::PlayerConnected { client_id, ent_id } => {
                 let this_client_id = client_transport.client_id();
                 let player_entity_id = spawn_player_client(&mut commands, ent_id, &sprites);
-
                 if this_client_id == client_id {
                     commands.entity(player_entity_id).insert(PlayerEntity);
                 }
@@ -46,18 +47,7 @@ pub(crate) fn receive_message(
     while let Some(message) = client.receive_message(DefaultChannel::Unreliable) {
         match bincode::deserialize(&message) {
             Ok(ServerMessages::SendPositions(players)) => {
-                for (player_id, transition) in players.iter() {
-                    let Some(player_entity) = lobby.players.get(player_id) else {
-                        continue;
-                    };
-
-                    let [x, y] = *transition;
-                    let transform = Transform {
-                        translation: Vec3::new(x, y, 0.0),
-                        ..Default::default()
-                    };
-                    commands.entity(*player_entity).insert(transform);
-                }
+                change_pos_ev.send(ChangePositions(players));
             }
 
             Ok(ServerMessages::AddItem(item)) => {

@@ -29,6 +29,7 @@ impl Plugin for MovementServerPlug {
         app.add_systems(Update, move_players_system);
         app.add_systems(Update, velocity);
         app.add_systems(Update, server_sync_players_movement);
+        app.init_resource::<ClientsPosition>();
     }
 }
 
