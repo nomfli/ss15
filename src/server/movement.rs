@@ -13,6 +13,9 @@ pub(crate) struct Speed {
     pub y: f32,
 }
 
+#[derive(Resource, Debug, Default, Serialize, Deserialize)]
+pub(crate) struct ClientsPosition(pub HashMap<ClientId, [f32; 2]>);
+
 #[derive(Component, Debug, Default, Serialize, Deserialize)]
 pub(crate) struct MaxSpeed(pub f32);
 
@@ -79,12 +82,15 @@ pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSp
 pub(crate) fn server_sync_players_movement(
     mut server: ResMut<RenetServer>,
     query: Query<(&Transform, &Player)>,
+    mut players: ResMut<ClientsPosition>,
 ) {
-    let mut players: HashMap<ClientId, [f32; 2]> = HashMap::new();
     for (transform, player) in query.iter() {
-        players.insert(player.id, transform.translation.truncate().into());
+        players
+            .0
+            .insert(player.id, transform.translation.truncate().into());
     }
-    if let Ok(sync_message) = bincode::serialize(&ServerMessages::SendPositions(players)) {
+    if let Ok(sync_message) = bincode::serialize(&ServerMessages::SendPositions(players.0.clone()))
+    {
         server.broadcast_message(DefaultChannel::Unreliable, sync_message);
     }
 }
