@@ -2,7 +2,7 @@ use crate::shared::{components::Player, messages::ServerMessages, resource::Move
 use bevy::prelude::*;
 use bevy_renet::renet::*;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Debug};
 
 pub(crate) const MAX_MOVE_SPEED: f32 = 1000.0;
 pub(crate) const ACCELERATION: f32 = 100.0;
@@ -14,7 +14,7 @@ pub(crate) struct Speed {
 }
 
 #[derive(Resource, Debug, Default, Serialize, Deserialize)]
-pub(crate) struct ClientsPosition(pub HashMap<ClientId, [f32; 2]>);
+pub(crate) struct Positions(pub HashMap<ClientId, [f32; 2]>);
 
 #[derive(Component, Debug, Default, Serialize, Deserialize)]
 pub(crate) struct MaxSpeed(pub f32);
@@ -28,8 +28,8 @@ impl Plugin for MovementServerPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, move_players_system);
         app.add_systems(Update, velocity);
-        app.add_systems(Update, server_sync_players_movement);
-        app.init_resource::<ClientsPosition>();
+        app.add_systems(Update, server_sync_players_movement::<Player>);
+        app.init_resource::<Positions>();
     }
 }
 
@@ -80,18 +80,28 @@ pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSp
     }
 }
 
-pub(crate) fn server_sync_players_movement(
+pub(crate) fn server_sync_players_movement<T: Component + Debug + Id>(
     mut server: ResMut<RenetServer>,
-    query: Query<(&Transform, &Player)>,
-    mut players: ResMut<ClientsPosition>,
+    query: Query<(&Transform, &T)>,
+    mut players: ResMut<Positions>,
 ) {
-    for (transform, player) in query.iter() {
+    for (transform, object) in query.iter() {
         players
             .0
-            .insert(player.id, transform.translation.truncate().into());
+            .insert(object.id(), transform.translation.truncate().into());
     }
     if let Ok(sync_message) = bincode::serialize(&ServerMessages::SendPositions(players.0.clone()))
     {
         server.broadcast_message(DefaultChannel::Unreliable, sync_message);
+    }
+}
+
+pub(crate) trait Id {
+    fn id(&self) -> u64;
+}
+
+impl Id for Player {
+    fn id(&self) -> u64 {
+        self.id
     }
 }
