@@ -44,27 +44,25 @@ pub(crate) fn client_connection_handler(
             let Some(server_ent) = lobby.players.get(&player_id) else {
                 continue;
             };
-            let message_about_old_connected =
-                bincode::serialize(&ServerMessages::PlayerConnected {
-                    client_id: player_id,
-                    ent_id: *server_ent,
-                })
-                .unwrap();
+            let connected_users_msg = bincode::serialize(&ServerMessages::PlayerConnected {
+                client_id: player_id,
+                ent_id: *server_ent,
+            })
+            .unwrap();
             server.send_message(
                 *client_id,
                 DefaultChannel::ReliableOrdered,
-                message_about_old_connected,
+                connected_users_msg,
             );
             if player_id != *client_id {
                 let Some(server_ent) = lobby.players.get(client_id) else {
                     continue;
                 };
-                let message_about_new_connected =
-                    bincode::serialize(&ServerMessages::PlayerConnected {
-                        client_id: *client_id,
-                        ent_id: *server_ent,
-                    });
-                if let Ok(msg) = message_about_new_connected {
+                let new_connected_msg = bincode::serialize(&ServerMessages::PlayerConnected {
+                    client_id: *client_id,
+                    ent_id: *server_ent,
+                });
+                if let Ok(msg) = new_connected_msg {
                     server.send_message(player_id, DefaultChannel::ReliableOrdered, msg);
                 }
             }
