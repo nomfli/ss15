@@ -1,12 +1,11 @@
-use crate::client::movement::ChangePositions;
+use crate::client::{connection::PlayerConnected, movement::ChangePositions};
 use crate::shared::{
-    components::{Grabbable, PlayerEntity},
+    components::Grabbable,
     messages::ServerMessages,
     resource::Lobby,
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
-use bevy_renet::netcode::NetcodeClientTransport;
 use bevy_renet::renet::*;
 
 pub struct ClientSyncPlayersPlug;
@@ -19,21 +18,16 @@ impl Plugin for ClientSyncPlayersPlug {
 pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
-    client_transport: Res<NetcodeClientTransport>,
     mut lobby: ResMut<Lobby>,
     sprites: Res<Sprites>,
     mut change_pos_ev: EventWriter<ChangePositions>,
+    mut user_connected_ev: EventWriter<PlayerConnected>,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
         match server_message {
             ServerMessages::PlayerConnected { client_id, ent_id } => {
-                let this_client_id = client_transport.client_id();
-                let player_entity_id = spawn_player_client(&mut commands, ent_id, &sprites);
-                if this_client_id == client_id {
-                    commands.entity(player_entity_id).insert(PlayerEntity);
-                }
-                lobby.players.insert(client_id, player_entity_id);
+                user_connected_ev.send(PlayerConnected { client_id, ent_id });
             }
 
             ServerMessages::PlayerDisconnected { id } => {
@@ -66,18 +60,5 @@ pub(crate) fn receive_message(
             }
             _ => {}
         }
-    }
-}
-
-fn spawn_player_client(commands: &mut Commands, _ent_id: Entity, sprites: &Res<Sprites>) -> Entity {
-    if let Some(sprite) = sprites.0.get("red_sqr") {
-        let player_entity_id = commands
-            .spawn(SpriteName("red_sqr".to_string()))
-            .insert(sprite.clone())
-            .id();
-
-        player_entity_id
-    } else {
-        panic!("BAD DATA!"); //idk what entity i need to return here
     }
 }

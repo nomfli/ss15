@@ -5,8 +5,8 @@ mod server;
 mod shared;
 
 use crate::client::{
-    init::ClientInitPlug, input::InputClientPlug, movement::MovementClientPlug,
-    network::ClientSyncPlayersPlug,
+    connection::ConnectionPlug, init::ClientInitPlug, input::InputClientPlug,
+    movement::MovementClientPlug, network::ClientSyncPlayersPlug,
 };
 use crate::server::{
     connection::ConnectionHandlerPlug, init::ServerInitPlug, movement::MovementServerPlug,
@@ -36,6 +36,7 @@ fn main() {
                 InputClientPlug,
                 MovementClientPlug,
                 ClientSyncPlayersPlug,
+                ConnectionPlug,
             ));
         }
 
