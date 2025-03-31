@@ -40,7 +40,7 @@ pub(crate) fn player_connected(
     }
 }
 
-fn spawn_player_client(commands: &mut Commands, _ent_id: Entity, sprites: &Res<Sprites>) -> Entity {
+fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sprites>) -> Entity {
     if let Some(sprite) = sprites.0.get("red_sqr") {
         let player_entity_id = commands
             .spawn(SpriteName("red_sqr".to_string()))
@@ -49,6 +49,6 @@ fn spawn_player_client(commands: &mut Commands, _ent_id: Entity, sprites: &Res<S
 
         player_entity_id
     } else {
-        panic!("BAD DATA!"); //idk what entity i need to return here
+        panic!("Missing sprite 'red_sqr' for entity ID {:?}", ent_id);
     }
 }
