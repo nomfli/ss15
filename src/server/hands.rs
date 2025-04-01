@@ -44,9 +44,10 @@ pub fn send_grabb_answer(
                 if !grabbable.0 {
                     continue;
                 }
-                if hands.all_hands[event.hand_idx].grabb_ent.is_none() {
-                    if (trans.translation.truncate() - pos.translation.truncate()).length()
+                if hands.all_hands[event.hand_idx].grabb_ent.is_none()
+                    && (trans.translation.truncate() - pos.translation.truncate()).length()
                         < hands.all_hands[event.hand_idx].hand_len
+                {
                     {
                         let Ok(sync_message) = bincode::serialize(&ServerMessages::GrabAnswer(
                             event.can_be_grabbed,

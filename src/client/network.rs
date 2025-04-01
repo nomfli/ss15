@@ -21,13 +21,14 @@ impl Plugin for ClientSyncPlayersPlug {
 
 pub(crate) fn receive_message(
     mut commands: Commands,
-    mut client: ResMut<RenetClient>,
-    mut lobby: ResMut<Lobby>,
+    (mut client, mut lobby): (ResMut<RenetClient>, ResMut<Lobby>),
     sprites: Res<Sprites>,
-    mut change_pos_ev: EventWriter<ChangePositions>,
-    mut user_connected_ev: EventWriter<PlayerConnected>,
-    mut grab_event: EventWriter<ShouldGrabb>,
-    mut throw_ev: EventWriter<ClientThrowEvent>,
+    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut throw_ev): (
+        EventWriter<ChangePositions>,
+        EventWriter<PlayerConnected>,
+        EventWriter<ShouldGrabb>,
+        EventWriter<ClientThrowEvent>,
+    ),
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
