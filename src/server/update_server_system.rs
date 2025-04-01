@@ -16,9 +16,10 @@ impl Plugin for UpdateServerPlug {
     }
 }
 
-pub fn connections_handler(
+pub(crate) fn connections_handler(
     mut server_events: EventReader<ServerEvent>,
     mut client_connected: EventWriter<SendPlayerConnection>,
+    mut send_items: EventWriter<SendItems>,
     mut lobby: ResMut<Lobby>,
     mut server: ResMut<RenetServer>,
     mut commands: Commands,
@@ -27,6 +28,9 @@ pub fn connections_handler(
         match event {
             ServerEvent::ClientConnected { client_id } => {
                 client_connected.send(SendPlayerConnection {
+                    client_id: *client_id,
+                });
+                send_items.send(SendItems {
                     client_id: *client_id,
                 });
             }
@@ -47,7 +51,7 @@ pub fn connections_handler(
     }
 }
 
-fn message_handler(
+pub(crate) fn message_handler(
     mut commands: Commands,
     lobby: Res<Lobby>,
     mut server: ResMut<RenetServer>,

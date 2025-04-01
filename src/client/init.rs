@@ -16,7 +16,7 @@ impl Plugin for ClientInitPlug {
     }
 }
 
-pub fn new_renet_client() -> (RenetClient, NetcodeClientTransport) {
+pub(crate) fn new_renet_client() -> (RenetClient, NetcodeClientTransport) {
     let server_addr = SERVER_ADDR.parse().unwrap();
     let socket = UdpSocket::bind("0.0.0.0:0").unwrap();
 
@@ -36,6 +36,6 @@ pub fn new_renet_client() -> (RenetClient, NetcodeClientTransport) {
     (client, transport)
 }
 
-fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2d { ..default() });
+pub(crate) fn setup_camera(mut commands: Commands) {
+    commands.spawn(Camera2d {});
 }

@@ -11,7 +11,7 @@ pub enum ServerMessages {
     GrabAnswer(Entity, ClientId),
     ThrowAnswer(Entity, ClientId, [f32; 2]),
     SendPositions(HashMap<ClientId, [f32; 2]>),
-    SendItem(([f32; 2], SpriteName, Entity, Grabbable)),
+    AddItem(([f32; 2], SpriteName, Entity, Grabbable)),
 }
 
 #[derive(Debug, Serialize, Deserialize, Component)]

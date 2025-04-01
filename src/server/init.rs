@@ -22,7 +22,7 @@ impl Plugin for ServerInitPlug {
     }
 }
 
-pub fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
+pub(crate) fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     let public_addr = SERVER_ADDR.parse().unwrap();
     let socket = UdpSocket::bind(public_addr).unwrap();
     let current_time = SystemTime::now()
@@ -40,10 +40,10 @@ pub fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     (server, transport)
 }
 
-pub fn init(sprites: Res<Sprites>, mut commands: Commands) {
+pub(crate) fn init(sprites: Res<Sprites>, mut commands: Commands) {
     let name = "blue_sqr".to_string();
     let Some(sprite) = sprites.0.get(&name) else {
-        panic!()
+        panic!("Expected sprite '{}' not found in sprites resource", name)
     };
     commands
         .spawn(sprite.clone())

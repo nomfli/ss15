@@ -1,6 +1,7 @@
 use crate::shared::resource::MovementInput;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+
 pub struct InputClientPlug;
 
 impl Plugin for InputClientPlug {
@@ -45,7 +46,7 @@ pub fn mouse_coords_to_world(
     }
 }
 
-pub fn movement_input(
+pub(crate) fn movement_input(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut player_input: ResMut<MovementInput>,
 ) {
@@ -59,6 +60,9 @@ pub fn movement_input(
         keyboard_input.pressed(KeyCode::KeyS) || keyboard_input.pressed(KeyCode::ArrowDown);
 }
 
-pub fn throw_input(keyboard_input: Res<ButtonInput<KeyCode>>, mut throw_input: ResMut<ThrowInput>) {
+pub(crate) fn throw_input(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut throw_input: ResMut<ThrowInput>,
+) {
     throw_input.0 = keyboard_input.pressed(KeyCode::KeyQ);
 }

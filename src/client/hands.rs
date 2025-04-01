@@ -66,6 +66,7 @@ pub fn try_to_grabb(
             let Some(cur_pos) = mouse_input.cords else {
                 continue;
             };
+
             if cur_pos.x >= sprite_position.x - half_size.x
                 && cur_pos.x <= sprite_position.x + half_size.x
                 && cur_pos.y >= sprite_position.y - half_size.y

@@ -1,5 +1,6 @@
-pub mod hands;
-pub mod init;
-pub mod input;
-pub mod movement;
-pub mod sync_players;
+pub(crate) mod connection;
+pub(crate) mod hands;
+pub(crate) mod init;
+pub(crate) mod input;
+pub(crate) mod movement;
+pub(crate) mod network;

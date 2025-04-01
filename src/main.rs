@@ -5,8 +5,8 @@ mod server;
 mod shared;
 
 use crate::client::{
-    hands::HandsClientPlug, init::ClientInitPlug, input::InputClientPlug,
-    movement::MovementClientPlug, sync_players::ClientSyncPlayersPlug,
+    connection::ConnectionPlug, hands::HandsClientPlug, init::ClientInitPlug,
+    input::InputClientPlug, movement::MovementClientPlug, network::ClientSyncPlayersPlug,
 };
 use crate::server::{
     connection::ConnectionHandlerPlug, hands::HandsServerPlug, init::ServerInitPlug,
@@ -16,7 +16,7 @@ use crate::shared::{resource::ResInitPlug, sprites::SpritesPlug};
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let exec_type = (&args[1]).as_str();
+    let exec_type = args[1].as_str();
     let mut app = App::new();
     app.add_plugins((DefaultPlugins, ResInitPlug, SpritesPlug));
 
@@ -36,8 +36,9 @@ fn main() {
                 ClientInitPlug,
                 InputClientPlug,
                 HandsClientPlug,
-                MovementClientPlug,
                 ClientSyncPlayersPlug,
+                MovementClientPlug,
+                ConnectionPlug,
             ));
         }
 
