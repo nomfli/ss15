@@ -22,7 +22,7 @@ pub fn init_sprites(mut sprites: ResMut<Sprites>, asset_server: Res<AssetServer>
     sprites.0.insert(
         red_sqr,
         Sprite {
-            custom_size: Some(Vec2::new(100.0, 100.0)),
+            custom_size: Some(Vec2::new(32.0, 32.0)),
             color: Color::srgb_u8(255, 0, 0),
             ..Default::default()
         },
