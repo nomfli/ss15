@@ -6,6 +6,15 @@ use crate::shared::{
 use bevy::prelude::*;
 use bevy_renet::renet::*;
 
+pub(crate) struct ServerSendPlug;
+
+impl Plugin for ServerSendPlug {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Update, send_items);
+        app.add_event::<SendItems>();
+    }
+}
+
 #[derive(Event)]
 pub(crate) struct SendItems {
     pub client_id: u64,

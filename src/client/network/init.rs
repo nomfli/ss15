@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy_renet::{netcode::*, renet::*, RenetClientPlugin};
 use std::{net::UdpSocket, time::SystemTime};
 
-struct ClientInitPlug;
+pub(crate) struct ClientInitPlug;
 
 impl Plugin for ClientInitPlug {
     fn build(&self, app: &mut App) {

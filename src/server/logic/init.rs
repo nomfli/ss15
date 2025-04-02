@@ -4,6 +4,14 @@ use crate::shared::{
 };
 use bevy::prelude::*;
 
+pub struct ServerInitPlug;
+
+impl Plugin for ServerInitPlug {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, init);
+    }
+}
+
 pub(crate) fn init(sprites: Res<Sprites>, mut commands: Commands) {
     let name = "blue_sqr".to_string();
     let Some(sprite) = sprites.0.get(&name) else {

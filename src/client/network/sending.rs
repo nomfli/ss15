@@ -2,7 +2,7 @@ use crate::shared::{messages::ClientMessages, resource::MovementInput};
 use bevy::prelude::*;
 use bevy_renet::renet::*;
 
-struct ClientSendingPlug;
+pub(crate) struct ClientSendingPlug;
 
 impl Plugin for ClientSendingPlug {
     fn build(&self, app: &mut App) {
