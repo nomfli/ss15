@@ -1,10 +1,5 @@
-use crate::server::movement::*;
-use crate::shared::{
-    components::{Grabbable, Player},
-    messages::ServerMessages,
-    resource::Lobby,
-    sprites::SpriteName,
-};
+use crate::server::logic::movement::*;
+use crate::shared::{components::Player, messages::ServerMessages, resource::Lobby};
 use bevy::prelude::*;
 use bevy_renet::renet::*;
 
@@ -14,18 +9,11 @@ impl Plugin for ConnectionHandlerPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, client_connection_handler);
         app.add_event::<SendPlayerConnection>();
-        app.add_event::<SendItems>();
-        app.add_systems(Update, send_items);
     }
 }
 
 #[derive(Event)]
 pub(crate) struct SendPlayerConnection {
-    pub client_id: u64,
-}
-
-#[derive(Event)]
-pub(crate) struct SendItems {
     pub client_id: u64,
 }
 
@@ -83,27 +71,4 @@ pub(crate) fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> E
         .insert(Speed { x: 0.0, y: 0.0 })
         .id();
     ent
-}
-
-pub(crate) fn send_items(
-    mut send_item: EventReader<SendItems>,
-    items: Query<(&Transform, &SpriteName, Entity, &Grabbable), Without<Player>>,
-    mut server: ResMut<RenetServer>,
-) {
-    for event in send_item.read() {
-        for item in items.iter() {
-            let (trans, name, ent, grabbable) = item;
-            let Vec2 { x, y } = trans.translation.truncate();
-            let item_msg = bincode::serialize(&ServerMessages::AddItem((
-                [x, y],
-                name.clone(),
-                ent,
-                *grabbable,
-            )));
-
-            if let Ok(msg) = item_msg {
-                server.send_message(event.client_id, DefaultChannel::Unreliable, msg)
-            }
-        }
-    }
 }

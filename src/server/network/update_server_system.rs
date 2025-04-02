@@ -1,4 +1,4 @@
-use crate::server::connection::*;
+use crate::server::network::{connection::*, sending::SendItems};
 use crate::shared::{
     messages::*,
     resource::{Lobby, MovementInput},
