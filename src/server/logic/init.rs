@@ -13,7 +13,7 @@ impl Plugin for ServerInitPlug {
 }
 
 pub(crate) fn init(sprites: Res<Sprites>, mut commands: Commands) {
-    let name = "blue_sqr".to_string();
+    let name = "adrenalin".to_string();
     let Some(sprite) = sprites.0.get(&name) else {
         panic!("Expected sprite '{}' not found in sprites resource", name)
     };
