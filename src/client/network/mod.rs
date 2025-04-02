@@ -1,3 +1,3 @@
 pub(crate) mod init;
-pub(crate) mod network;
+pub(crate) mod receive;
 pub(crate) mod sending;
