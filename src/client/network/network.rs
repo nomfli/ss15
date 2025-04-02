@@ -1,4 +1,4 @@
-use crate::client::{connection::PlayerConnected, movement::ChangePositions};
+use crate::client::render::{connection::PlayerConnected, movement::ChangePositions};
 use crate::shared::{
     components::Grabbable,
     messages::ServerMessages,
@@ -8,8 +8,9 @@ use crate::shared::{
 use bevy::prelude::*;
 use bevy_renet::renet::*;
 
-pub struct ClientSyncPlayersPlug;
-impl Plugin for ClientSyncPlayersPlug {
+pub struct ClientNetworkPlug;
+
+impl Plugin for ClientNetworkPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, receive_message);
     }
@@ -45,6 +46,8 @@ pub(crate) fn receive_message(
             }
 
             Ok(ServerMessages::AddItem(item)) => {
+                //need to
+                //incapsulate
                 let ([x, y], name, _ent, grabbable) = item;
                 let Some(sprite) = sprites.0.get(&name.0) else {
                     continue;
