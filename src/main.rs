@@ -6,7 +6,7 @@ mod shared;
 
 use crate::{
     client::{
-        network::{init::ClientInitPlug, network::ClientNetworkPlug, sending::ClientSendingPlug},
+        network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
         render::{
             connection::ConnectionPlug, init::InitRenderPlug, input::InputClientPlug,
             movement::MovementClientPlug,
