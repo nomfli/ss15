@@ -1,8 +1,10 @@
-use crate::client::render::{connection::PlayerConnected, movement::ChangePositions};
+use crate::client::render::{
+    connection::PlayerConnected, hands::ShouldGrabb, movement::ChangePositions,
+};
 use crate::shared::{
     components::Grabbable,
     messages::ServerMessages,
-    resource::Lobby,
+    resource::{Entities, Lobby},
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -23,6 +25,8 @@ pub(crate) fn receive_message(
     sprites: Res<Sprites>,
     mut change_pos_ev: EventWriter<ChangePositions>,
     mut user_connected_ev: EventWriter<PlayerConnected>,
+    mut grab_event: EventWriter<ShouldGrabb>,
+    mut ents: ResMut<Entities>,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -48,18 +52,26 @@ pub(crate) fn receive_message(
             Ok(ServerMessages::AddItem(item)) => {
                 //need to
                 //incapsulate
-                let ([x, y], name, _ent, grabbable) = item;
+                let ([x, y], name, ent, grabbable) = item;
                 let Some(sprite) = sprites.0.get(&name.0) else {
                     continue;
                 };
-                commands
+                let client_ent_id = commands
                     .spawn(Transform {
                         translation: Vec3::new(x, y, 0.0),
                         ..Default::default()
                     })
                     .insert(SpriteName(name.0))
                     .insert(Grabbable(grabbable.0))
-                    .insert(sprite.clone());
+                    .insert(sprite.clone())
+                    .id();
+                ents.entities.insert(client_ent_id, ent);
+            }
+            Ok(ServerMessages::GrabAnswer(ent, id)) => {
+                grab_event.send(ShouldGrabb {
+                    i_must_be_grabbed: ent,
+                    who_should_grabe: id,
+                });
             }
             _ => {}
         }
