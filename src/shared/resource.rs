@@ -59,24 +59,6 @@ where
     pub fn get_by_second(&self, value: &V) -> Option<&T> {
         self.to_first.get(value)
     }
-
-    pub fn remove_by_first(&mut self, key: &T) -> Option<V> {
-        if let Some(value) = self.to_second.remove(key) {
-            self.to_first.remove(&value);
-            Some(value)
-        } else {
-            None
-        }
-    }
-
-    pub fn remove_by_second(&mut self, value: &V) -> Option<T> {
-        if let Some(key) = self.to_first.remove(value) {
-            self.to_second.remove(&key);
-            Some(key)
-        } else {
-            None
-        }
-    }
 }
 
 #[derive(Debug, Resource)]
