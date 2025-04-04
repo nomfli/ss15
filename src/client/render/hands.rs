@@ -14,9 +14,11 @@ impl Plugin for HandsClientPlug {
     fn build(&self, app: &mut App) {
         app.add_event::<ShouldGrabb>();
         app.add_event::<TryToGrabbEvent>();
+        app.add_event::<SendTryThrow>();
         app.add_systems(Update, change_hand);
         app.add_systems(Update, try_to_grabb);
         app.add_systems(Update, grab_event_handler);
+        app.add_systems(Update, try_throw);
     }
 }
 
@@ -76,6 +78,7 @@ pub fn try_to_grabb(
         }
     }
 }
+
 #[derive(Event, Debug)]
 pub struct ShouldGrabb {
     pub i_must_be_grabbed: Entity,
@@ -110,5 +113,33 @@ pub fn grab_event_handler(
             .entity(must_be_grabbed)
             .remove::<Sprite>()
             .remove::<Transform>();
+    }
+}
+
+#[derive(Event)]
+pub(crate) struct SendTryThrow {
+    pub hand_idx: usize,
+    pub where_throw: Vec2,
+}
+
+pub(crate) fn try_throw(
+    keyboard: Res<ButtonInput<KeyCode>>,
+    query: Query<(&PlayerEntity, &Hands)>,
+    mut send_ev: EventWriter<SendTryThrow>,
+    mouse_input: Res<Mouse>,
+) {
+    let (_, hands) = query.single();
+    let hand_idx = hands.selected_hand;
+    if hands.all_hands[hand_idx].grabb_ent.is_none() {
+        return;
+    }
+    let Some(where_throw) = mouse_input.cords else {
+        return;
+    };
+    if keyboard.pressed(KeyCode::KeyQ) {
+        send_ev.send(SendTryThrow {
+            hand_idx,
+            where_throw,
+        });
     }
 }

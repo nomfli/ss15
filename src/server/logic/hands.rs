@@ -8,7 +8,10 @@ impl Plugin for HandsServerPlug {
     fn build(&self, app: &mut App) {
         app.add_event::<GrabEvent>();
         app.add_event::<GrabAnsEv>();
+        app.add_event::<ThrowEvent>();
+        app.add_event::<ThrowAnswerEv>();
         app.add_systems(Update, grabb_answer_handler);
+        app.add_systems(Update, throw_answer);
     }
 }
 
@@ -57,6 +60,47 @@ pub fn grabb_answer_handler(
                     };
                 }
             }
+        }
+    }
+}
+
+#[derive(Event, Debug)]
+pub(crate) struct ThrowEvent {
+    pub client: ClientId,
+    pub selected_idx: usize,
+    pub i_want_throw: Entity,
+    pub where_throw: Vec2,
+}
+
+#[derive(Event, Debug)]
+pub(crate) struct ThrowAnswerEv(pub Entity, pub ClientId, pub [f32; 2]);
+
+pub(crate) fn throw_answer(
+    mut throw_ev: EventReader<ThrowEvent>,
+    mut answer: EventWriter<ThrowAnswerEv>,
+    mut i_want_throw: Query<(&Transform, &mut Hands)>,
+    mut commands: Commands,
+) {
+    for event in throw_ev.read() {
+        if let Ok((trans, mut hands)) = i_want_throw.get_mut(event.i_want_throw) {
+            let Some(grabb_ent) = hands.all_hands[event.selected_idx].grabb_ent else {
+                continue;
+            };
+            let distance = event.where_throw - trans.translation.truncate();
+            let res_throw_pos = if distance.length() < hands.all_hands[event.selected_idx].hand_len
+            {
+                event.where_throw
+            } else {
+                distance.normalize() * hands.all_hands[event.selected_idx].hand_len
+                    + trans.translation.truncate()
+            };
+            let Vec2 { x, y } = res_throw_pos;
+            hands.all_hands[event.selected_idx].grabb_ent = None;
+            commands.entity(grabb_ent).insert(Transform {
+                translation: Vec3::new(x, y, 0.0),
+                ..Default::default()
+            });
+            answer.send(ThrowAnswerEv(grabb_ent, event.client, [x, y]));
         }
     }
 }

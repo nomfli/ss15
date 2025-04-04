@@ -1,5 +1,5 @@
 use crate::{
-    client::render::hands::TryToGrabbEvent,
+    client::render::hands::{SendTryThrow, TryToGrabbEvent},
     shared::{messages::ClientMessages, resource::MovementInput},
 };
 use bevy::prelude::*;
@@ -39,5 +39,20 @@ pub(crate) fn send_grabbing(
         }) {
             client.send_message(DefaultChannel::Unreliable, grabb_msg);
         }
+    }
+}
+
+pub(crate) fn send_try_to_throw(
+    mut ev_reader: EventReader<SendTryThrow>,
+    mut client: ResMut<RenetClient>,
+) {
+    for event in ev_reader.read() {
+        let Ok(throw_msg) = bincode::serialize(&ClientMessages::Throw {
+            selected_idx: event.hand_idx,
+            where_throw: event.where_throw,
+        }) else {
+            continue;
+        };
+        client.send_message(DefaultChannel::Unreliable, throw_msg);
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    server::logic::hands::GrabAnsEv,
+    server::logic::hands::{GrabAnsEv, ThrowAnswerEv},
     shared::{
         components::{Grabbable, Player},
         messages::ServerMessages,
@@ -56,8 +56,27 @@ pub(crate) fn send_grab_answer(
             event.can_be_grabbed,
             event.client,
         )) else {
-            return;
+            continue;
         };
         server.broadcast_message(DefaultChannel::Unreliable, sync_message);
     }
+}
+
+
+pub (crate) fn send_throw_answer(
+    mut server: ResMut<RenetServer>,
+    mut throw_answer: EventReader<ThrowAnswerEv>,) {
+    for event in throw_answer.read() {
+        let Ok(throw_msg) = bincode::serialize(&ServerMessages::ThrowAnswer(
+                event.0,
+                event.2,
+                                event.1,
+
+
+                
+                )) else {
+        continue;
+        }
+    }
+
 }
