@@ -99,7 +99,7 @@ pub fn grab_event_handler(
         else {
             continue;
         };
-        if !commands.get_entity(must_be_grabbed).is_some() {
+        if commands.get_entity(must_be_grabbed).is_none() {
             continue;
         }
 

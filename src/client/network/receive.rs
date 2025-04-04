@@ -22,11 +22,13 @@ pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
-    sprites: Res<Sprites>,
-    mut change_pos_ev: EventWriter<ChangePositions>,
-    mut user_connected_ev: EventWriter<PlayerConnected>,
-    mut grab_event: EventWriter<ShouldGrabb>,
     mut ents: ResMut<Entities>,
+    sprites: Res<Sprites>,
+    (mut change_pos_ev, mut user_connected_ev, mut grab_event): (
+        EventWriter<ChangePositions>,
+        EventWriter<PlayerConnected>,
+        EventWriter<ShouldGrabb>,
+    ),
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
