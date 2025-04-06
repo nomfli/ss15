@@ -17,7 +17,7 @@ pub enum ServerMessages {
     AddItem(([f32; 2], SpriteName, Entity, Grabbable)),
     GrabAnswer(Entity, ClientId),
     ThrowAnswer {
-        i_want_throw: Entity,
+        client_id: ClientId,
         hand_idx: usize,
         where_throw: [f32; 2],
     },

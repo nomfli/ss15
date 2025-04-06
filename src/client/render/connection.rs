@@ -10,7 +10,7 @@ pub struct ConnectionPlug;
 
 impl Plugin for ConnectionPlug {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, player_connected);
+        app.add_systems(PreUpdate, player_connected);
         app.add_event::<PlayerConnected>();
     }
 }

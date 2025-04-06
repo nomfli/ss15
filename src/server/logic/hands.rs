@@ -1,4 +1,7 @@
-use crate::shared::components::{Grabbable, Hands};
+use crate::shared::{
+    components::{Grabbable, Hands},
+    events::ThrowAnswerEv,
+};
 use bevy::prelude::*;
 use bevy_renet::renet::*;
 
@@ -9,7 +12,6 @@ impl Plugin for HandsServerPlug {
         app.add_event::<GrabEvent>();
         app.add_event::<GrabAnsEv>();
         app.add_event::<ThrowEvent>();
-        app.add_event::<ThrowAnswerEv>();
         app.add_systems(Update, grabb_answer_handler);
         app.add_systems(Update, throw_answer);
     }
@@ -72,9 +74,6 @@ pub(crate) struct ThrowEvent {
     pub where_throw: Vec2,
 }
 
-#[derive(Event, Debug)]
-pub(crate) struct ThrowAnswerEv(pub Entity, pub ClientId, pub [f32; 2]);
-
 pub(crate) fn throw_answer(
     mut throw_ev: EventReader<ThrowEvent>,
     mut answer: EventWriter<ThrowAnswerEv>,
@@ -100,7 +99,11 @@ pub(crate) fn throw_answer(
                 translation: Vec3::new(x, y, 0.0),
                 ..Default::default()
             });
-            answer.send(ThrowAnswerEv(grabb_ent, event.client, [x, y]));
+            answer.send(ThrowAnswerEv {
+                hand_idx: event.selected_idx,
+                client: event.client,
+                where_throw: [x, y],
+            });
         }
     }
 }

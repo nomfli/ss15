@@ -11,6 +11,7 @@ impl Plugin for ClientSendingPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, client_send_movement);
         app.add_systems(Update, send_grabbing);
+        app.add_systems(Update, send_try_to_throw);
     }
 }
 
