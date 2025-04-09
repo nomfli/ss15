@@ -1,5 +1,5 @@
 use crate::shared::{
-    components::{Grabbable, Speed},
+    components::{Direction, Grabbable, Speed},
     sprites::SpriteName,
 };
 use bevy::prelude::*;
@@ -29,4 +29,5 @@ pub enum ClientMessages {
         can_be_grabbed: Entity,
         hand_idx: usize,
     },
+    Direction(Direction),
 }

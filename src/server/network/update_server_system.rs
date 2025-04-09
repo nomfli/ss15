@@ -93,6 +93,7 @@ pub(crate) fn message_handler(
                         client: client_id,
                     });
                 }
+
                 Err(_) => {}
             }
         }
