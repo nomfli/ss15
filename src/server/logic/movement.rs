@@ -1,4 +1,8 @@
-use crate::shared::{components::Player, messages::ServerMessages, resource::MovementInput};
+use crate::shared::{
+    components::{Player, Speed},
+    messages::ServerMessages,
+    resource::MovementInput,
+};
 use bevy::prelude::*;
 use bevy_renet::renet::*;
 use serde::{Deserialize, Serialize};

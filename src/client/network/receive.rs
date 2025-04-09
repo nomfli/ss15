@@ -1,5 +1,7 @@
 use crate::client::render::{
-    connection::PlayerConnected, hands::ShouldGrabb, movement::ChangePositions,
+    connection::PlayerConnected,
+    hands::ShouldGrabb,
+    movement::{ChangePositions, SpeedEvent},
 };
 use crate::shared::{
     components::Grabbable,
@@ -24,10 +26,11 @@ pub(crate) fn receive_message(
     mut lobby: ResMut<Lobby>,
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
-    (mut change_pos_ev, mut user_connected_ev, mut grab_event): (
+    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut speed_event): (
         EventWriter<ChangePositions>,
         EventWriter<PlayerConnected>,
         EventWriter<ShouldGrabb>,
+        EventWriter<SpeedEvent>,
     ),
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
@@ -74,6 +77,9 @@ pub(crate) fn receive_message(
                     i_must_be_grabbed: ent,
                     who_should_grabe: id,
                 });
+            }
+            Ok(ServerMessages::Speed(speed)) => {
+                speed_event.send(SpeedEvent(speed));
             }
             _ => {}
         }
