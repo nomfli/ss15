@@ -15,6 +15,7 @@ impl Plugin for ServerSendPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, send_items);
         app.add_systems(Update, send_grab_answer);
+        app.add_systems(Update, send_speed);
         app.add_event::<SendItems>();
     }
 }
