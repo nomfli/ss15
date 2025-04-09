@@ -9,11 +9,14 @@ use crate::{
         network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
         render::{
             connection::ConnectionPlug, hands::HandsClientPlug, init::InitRenderPlug,
-            input::InputClientPlug, movement::MovementClientPlug,
+            input::InputClientPlug, movement::MovementClientPlug, rotation::RotClientPlug,
         },
     },
     server::{
-        logic::{hands::HandsServerPlug, init::ServerInitPlug, movement::MovementServerPlug},
+        logic::{
+            hands::HandsServerPlug, init::ServerInitPlug, movement::MovementServerPlug,
+            rotation::RotServerPlug,
+        },
         network::{
             connection::ConnectionHandlerPlug, init::StartupServerPlug, sending::ServerSendPlug,
             update_server_system::UpdateServerPlug,
@@ -39,6 +42,7 @@ fn main() {
                 ServerSendPlug,
                 UpdateServerPlug,
                 HandsServerPlug,
+                RotServerPlug,
             ));
         }
 
@@ -52,6 +56,7 @@ fn main() {
                 InputClientPlug,
                 MovementClientPlug,
                 HandsClientPlug,
+                RotClientPlug,
             ));
         }
 

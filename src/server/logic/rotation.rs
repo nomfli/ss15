@@ -6,19 +6,19 @@ pub(crate) struct RotServerPlug;
 
 impl Plugin for RotServerPlug {
     fn build(&self, app: &mut App) {
-        app.add_event::<RotationEvent>();
+        app.add_event::<DirectionEvent>();
         app.add_systems(Update, send_rotation);
     }
 }
 
 #[derive(Event)]
-pub(crate) struct RotationEvent {
+pub(crate) struct DirectionEvent {
     pub client: ClientId,
     pub direction: Direction,
 }
 
 pub(crate) fn send_rotation(
-    mut rot_ev: EventReader<RotationEvent>,
+    mut rot_ev: EventReader<DirectionEvent>,
     mut server: ResMut<RenetServer>,
     lobby: Res<Lobby>,
 ) {
@@ -29,7 +29,7 @@ pub(crate) fn send_rotation(
                     continue;
                 };
                 let Ok(rot_msg) =
-                    bincode::serialize(&ServerMessages::Rotation(event.direction, *ent))
+                    bincode::serialize(&ServerMessages::Direction(event.direction, *ent))
                 else {
                     continue;
                 };

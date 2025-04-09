@@ -15,6 +15,7 @@ pub enum ServerMessages {
     AddItem(([f32; 2], SpriteName, Entity, Grabbable)),
     GrabAnswer(Entity, ClientId),
     Speed(Speed),
+    Direction(Direction, Entity),
 }
 
 #[derive(Debug, Serialize, Deserialize, Component)]
