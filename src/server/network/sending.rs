@@ -1,7 +1,7 @@
 use crate::{
     server::logic::hands::GrabAnsEv,
     shared::{
-        components::{Grabbable, Player},
+        components::{Grabbable, Player, Speed},
         messages::ServerMessages,
         sprites::SpriteName,
     },
@@ -62,8 +62,10 @@ pub(crate) fn send_grab_answer(
     }
 }
 
-
-pub(crate) fn send_speed(
-    mut server: ResMut<RenetServer>,
-    mut 
-    )
+pub(crate) fn send_speed(query: Query<(&Player, &Speed)>, mut server: ResMut<RenetServer>) {
+    for (player, speed) in query.iter() {
+        if let Ok(speed_msg) = bincode::serialize(&ServerMessages::Speed(*speed)) {
+            server.send_message(player.id, DefaultChannel::Unreliable, speed_msg);
+        }
+    }
+}

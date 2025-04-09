@@ -27,3 +27,9 @@ pub struct Hands {
     pub all_hands: Vec<Hand>,
     pub selected_hand: usize,
 }
+
+#[derive(Component, Debug, Default, Serialize, Deserialize, Clone, Copy)]
+pub(crate) struct Speed {
+    pub x: f32,
+    pub y: f32,
+}

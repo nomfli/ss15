@@ -1,4 +1,7 @@
-use crate::shared::{components::Grabbable, sprites::SpriteName};
+use crate::shared::{
+    components::{Grabbable, Speed},
+    sprites::SpriteName,
+};
 use bevy::prelude::*;
 use bevy_renet::renet::ClientId;
 use serde::{Deserialize, Serialize};
@@ -11,6 +14,7 @@ pub enum ServerMessages {
     SendPositions(HashMap<ClientId, [f32; 2]>),
     AddItem(([f32; 2], SpriteName, Entity, Grabbable)),
     GrabAnswer(Entity, ClientId),
+    Speed(Speed),
 }
 
 #[derive(Debug, Serialize, Deserialize, Component)]
