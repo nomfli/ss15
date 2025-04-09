@@ -43,9 +43,9 @@ pub(crate) fn player_connected(
 }
 
 fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sprites>) -> Entity {
-    if let Some(sprite) = sprites.0.get("red_sqr") {
+    if let Some(sprite) = sprites.0.get("human") {
         let player_entity_id = commands
-            .spawn(SpriteName("red_sqr".to_string()))
+            .spawn(SpriteName("human".to_string()))
             .insert(sprite.clone())
             .insert(Hands {
                 all_hands: vec![
@@ -64,6 +64,6 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
 
         player_entity_id
     } else {
-        panic!("Missing sprite 'red_sqr' for entity ID {:?}", ent_id);
+        panic!("Missing sprite 'human' for entity ID {:?}", ent_id);
     }
 }
