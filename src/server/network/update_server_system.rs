@@ -93,6 +93,12 @@ pub(crate) fn message_handler(
                         client: client_id,
                     });
                 }
+                Ok(ClientMessages::Direction(dir)) => {
+                    dir_ev.send(DirectionEvent {
+                        client: client_id,
+                        direction: dir,
+                    });
+                }
 
                 Err(_) => {}
             }
