@@ -1,3 +1,4 @@
+use crate::client::render::camera::camera_follow_smooth;
 use crate::shared::{
     components::{PlayerEntity, Speed},
     resource::Lobby,
@@ -12,7 +13,10 @@ impl Plugin for MovementClientPlug {
         app.add_event::<ChangePositions>();
         app.add_event::<SpeedEvent>();
         app.add_systems(Update, change_position);
-        app.add_systems(Update, change_speed);
+        app.add_systems(
+            Update,
+            (change_speed, camera_follow_smooth.after(change_position)),
+        );
     }
 }
 
