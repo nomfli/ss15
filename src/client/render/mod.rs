@@ -1,3 +1,4 @@
+pub(crate) mod camera;
 pub(crate) mod connection;
 pub(crate) mod hands;
 pub(crate) mod init;
