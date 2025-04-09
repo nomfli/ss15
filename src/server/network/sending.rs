@@ -61,3 +61,9 @@ pub(crate) fn send_grab_answer(
         server.broadcast_message(DefaultChannel::Unreliable, sync_message);
     }
 }
+
+
+pub(crate) fn send_speed(
+    mut server: ResMut<RenetServer>,
+    mut 
+    )
