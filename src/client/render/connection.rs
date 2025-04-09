@@ -1,5 +1,5 @@
 use crate::shared::{
-    components::{Hand, Hands, PlayerEntity},
+    components::{Direction, Hand, Hands, PlayerEntity},
     resource::{Entities, Lobby},
     sprites::{SpriteName, Sprites},
 };
@@ -60,6 +60,7 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
                 ],
                 selected_hand: 0,
             })
+            .insert(Direction::Down)
             .id();
 
         player_entity_id

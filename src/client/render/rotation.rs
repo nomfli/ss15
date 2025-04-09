@@ -55,6 +55,7 @@ pub(crate) fn change_direction(
                 *direction = Direction::Left;
             }
         }
+        print!("IWASHERE");
     }
 }
 
@@ -97,6 +98,7 @@ pub(crate) fn render_rotation(mut query: Query<(&Direction, &mut Sprite)>) {
                 Direction::Right => 2,
                 Direction::Left => 3,
             };
+            println!("{:?}", atlas.index);
         }
     }
 }

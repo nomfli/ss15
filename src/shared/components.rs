@@ -36,8 +36,8 @@ pub(crate) struct Speed {
 
 #[derive(Component, Debug, Default, Serialize, Deserialize, Clone, Copy)]
 pub(crate) enum Direction {
-    Up,
     #[default]
+    Up,
     Down,
     Left,
     Right,
