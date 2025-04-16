@@ -4,14 +4,24 @@ mod client;
 mod server;
 mod shared;
 
-use crate::client::{
-    connection::ConnectionPlug, init::ClientInitPlug, input::InputClientPlug,
-    movement::MovementClientPlug, network::ClientSyncPlayersPlug,
+
+use crate::{
+    client::{
+        network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
+        render::{
+            connection::ConnectionPlug, init::InitRenderPlug, input::InputClientPlug,
+            movement::MovementClientPlug,
+        },
+    },
+    server::{
+        logic::{init::ServerInitPlug, movement::MovementServerPlug},
+        network::{
+            connection::ConnectionHandlerPlug, init::StartupServerPlug, sending::ServerSendPlug,
+            update_server_system::UpdateServerPlug,
+        },
+    },
 };
-use crate::server::{
-    connection::ConnectionHandlerPlug, init::ServerInitPlug, movement::MovementServerPlug,
-    update_server_system::UpdateServerPlug,
-};
+
 use crate::shared::{resource::ResInitPlug, sprites::SpritesPlug};
 
 fn main() {
@@ -25,18 +35,23 @@ fn main() {
             app.add_plugins((
                 ServerInitPlug,
                 MovementServerPlug,
-                UpdateServerPlug,
                 ConnectionHandlerPlug,
+                StartupServerPlug,
+                ServerSendPlug,
+                UpdateServerPlug,
             ));
         }
 
         "client" => {
             app.add_plugins((
                 ClientInitPlug,
+                ClientNetworkPlug,
+                ClientSendingPlug,
+                ConnectionPlug,
+                InitRenderPlug,
                 InputClientPlug,
                 MovementClientPlug,
-                ClientSyncPlayersPlug,
-                ConnectionPlug,
+
             ));
         }
 

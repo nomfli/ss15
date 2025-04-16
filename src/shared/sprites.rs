@@ -17,23 +17,21 @@ pub struct Sprites(pub HashMap<String, Sprite>);
 #[derive(Debug, Default, Component, Deserialize, Serialize, Clone)]
 pub struct SpriteName(pub String);
 
-pub fn init_sprites(mut sprites: ResMut<Sprites>) {
+pub fn init_sprites(mut sprites: ResMut<Sprites>, asset_server: Res<AssetServer>) {
     let red_sqr = "red_sqr".to_string();
     sprites.0.insert(
         red_sqr,
         Sprite {
-            custom_size: Some(Vec2::new(100.0, 100.0)),
+            custom_size: Some(Vec2::new(32.0, 32.0)),
             color: Color::srgb_u8(255, 0, 0),
             ..Default::default()
         },
     );
-    let blue_sqr = "blue_sqr".to_string();
+
+    let adrenalin = "adrenalin".to_string();
+
     sprites.0.insert(
-        blue_sqr,
-        Sprite {
-            custom_size: Some(Vec2::new(100.0, 100.0)),
-            color: Color::srgb_u8(0, 0, 255),
-            ..Default::default()
-        },
+        adrenalin,
+        Sprite::from_image(asset_server.load("./images/adrenalin.png")),
     );
 }
