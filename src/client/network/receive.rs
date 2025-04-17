@@ -22,10 +22,10 @@ pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
+    mut positions: ResMut<ChangePositions>,
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
-    (mut change_pos_ev, mut user_connected_ev, mut grab_event): (
-        EventWriter<ChangePositions>,
+    (mut user_connected_ev, mut grab_event): (
         EventWriter<PlayerConnected>,
         EventWriter<ShouldGrabb>,
     ),
@@ -48,7 +48,17 @@ pub(crate) fn receive_message(
     while let Some(message) = client.receive_message(DefaultChannel::Unreliable) {
         match bincode::deserialize(&message) {
             Ok(ServerMessages::SendPositions(players)) => {
-                change_pos_ev.send(ChangePositions(players));
+                let updates: Vec<_> = players
+                    .iter()
+                    .filter_map(|(ent, cords)| {
+                        ents.entities
+                            .get_by_second(ent)
+                            .map(|client_ent| (*client_ent, *cords))
+                    })
+                    .collect();
+                for (client_ent, cords) in updates {
+                    positions.0.insert(client_ent, cords);
+                }
             }
 
             Ok(ServerMessages::AddItem(item)) => {
