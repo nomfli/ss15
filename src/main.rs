@@ -4,7 +4,6 @@ mod client;
 mod server;
 mod shared;
 
-
 use crate::{
     client::{
         network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
@@ -51,7 +50,6 @@ fn main() {
                 InitRenderPlug,
                 InputClientPlug,
                 MovementClientPlug,
-
             ));
         }
 

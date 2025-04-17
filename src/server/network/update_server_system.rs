@@ -1,4 +1,7 @@
-use crate::server::network::{connection::*, sending::SendItems};
+use crate::server::{
+    logic::chat::MsgHandlerEvent,
+    network::{connection::*, sending::SendItems},
+};
 use crate::shared::{
     messages::*,
     resource::{Lobby, MovementInput},
@@ -53,6 +56,7 @@ pub(crate) fn connections_handler(
 pub(crate) fn message_handler(
     mut commands: Commands,
     lobby: Res<Lobby>,
+    mut chat_msg_ev: EventWriter<MsgHandlerEvent>,
     mut server: ResMut<RenetServer>,
 ) {
     for client_id in server.clients_id() {
@@ -73,6 +77,16 @@ pub(crate) fn message_handler(
                         down,
                         left,
                         right,
+                    });
+                }
+                Ok(ClientMessages::ChatMsg { text, mode }) => {
+                    let Some(ent) = lobby.players.get(&client_id) else {
+                        continue;
+                    };
+                    chat_msg_ev.send(MsgHandlerEvent {
+                        mode,
+                        text,
+                        client_ent: *ent,
                     });
                 }
                 Err(_) => {}
