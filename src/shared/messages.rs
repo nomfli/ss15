@@ -1,4 +1,4 @@
-use crate::shared::{components::Grabbable, sprites::SpriteName};
+use crate::shared::{chat::ChatMode, components::Grabbable, sprites::SpriteName};
 use bevy::prelude::*;
 use bevy_renet::renet::ClientId;
 use serde::{Deserialize, Serialize};
@@ -19,5 +19,9 @@ pub enum ClientMessages {
         left: bool,
         right: bool,
         down: bool,
+    },
+    ChatMsg {
+        mode: ChatMode,
+        text: String,
     },
 }
