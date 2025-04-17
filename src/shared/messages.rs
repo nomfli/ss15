@@ -8,7 +8,7 @@ use std::collections::HashMap;
 pub enum ServerMessages {
     PlayerConnected { client_id: ClientId, ent_id: Entity },
     PlayerDisconnected { id: ClientId },
-    SendPositions(HashMap<ClientId, [f32; 2]>),
+    SendPositions(HashMap<Entity, [f32; 2]>),
     AddItem(([f32; 2], SpriteName, Entity, Grabbable)),
     GrabAnswer(Entity, ClientId),
 }
