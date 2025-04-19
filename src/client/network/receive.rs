@@ -6,6 +6,7 @@ use crate::shared::{
     events::ThrowAnswerEv,
     messages::ServerMessages,
     resource::{Entities, Lobby},
+
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -23,6 +24,7 @@ pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
+
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
     (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut throw_ev): (
@@ -61,6 +63,7 @@ pub(crate) fn receive_message(
                     continue;
                 };
                 let client_ent_id = commands
+
                     .spawn(Transform {
                         translation: Vec3::new(x, y, 0.0),
                         ..Default::default()
@@ -87,6 +90,7 @@ pub(crate) fn receive_message(
                     hand_idx,
                     where_throw,
                 });
+
             }
             _ => {}
         }

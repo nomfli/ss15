@@ -14,6 +14,7 @@ use crate::{
     },
     server::{
         logic::{hands::HandsServerPlug, init::ServerInitPlug, movement::MovementServerPlug},
+
         network::{
             connection::ConnectionHandlerPlug, init::StartupServerPlug, sending::ServerSendPlug,
             update_server_system::UpdateServerPlug,
@@ -21,13 +22,16 @@ use crate::{
     },
 };
 
+
 use crate::shared::{events::SharedEvents, resource::ResInitPlug, sprites::SpritesPlug};
+
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let exec_type = args[1].as_str();
     let mut app = App::new();
     app.add_plugins((DefaultPlugins, ResInitPlug, SpritesPlug, SharedEvents));
+
 
     match exec_type {
         "server" => {
@@ -39,6 +43,7 @@ fn main() {
                 ServerSendPlug,
                 UpdateServerPlug,
                 HandsServerPlug,
+
             ));
         }
 
@@ -52,6 +57,7 @@ fn main() {
                 InputClientPlug,
                 MovementClientPlug,
                 HandsClientPlug,
+
             ));
         }
 
