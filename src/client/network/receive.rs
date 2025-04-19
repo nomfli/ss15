@@ -3,6 +3,7 @@ use crate::client::render::{
 };
 use crate::shared::{
     components::Grabbable,
+    events::ThrowAnswerEvent,
     messages::ServerMessages,
     resource::{Entities, Lobby},
     sprites::{SpriteName, Sprites},
@@ -24,10 +25,11 @@ pub(crate) fn receive_message(
     mut lobby: ResMut<Lobby>,
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
-    (mut change_pos_ev, mut user_connected_ev, mut grab_event): (
+    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut throw_event): (
         EventWriter<ChangePositions>,
         EventWriter<PlayerConnected>,
         EventWriter<ShouldGrab>,
+        EventWriter<ThrowAnswerEvent>,
     ),
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
@@ -73,6 +75,17 @@ pub(crate) fn receive_message(
                 grab_event.send(ShouldGrab {
                     i_must_be_grabbed: ent,
                     who_should_grab: id,
+                });
+            }
+            Ok(ServerMessages::ThrowAnswer {
+                client_id,
+                hand_idx,
+                where_throw,
+            }) => {
+                throw_event.send(ThrowAnswerEvent {
+                    client: client_id,
+                    hand_idx,
+                    where_throw,
                 });
             }
             _ => {}

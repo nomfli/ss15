@@ -75,6 +75,7 @@ pub(crate) fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> E
         .insert(Hands {
             all_hands: vec![
                 Hand {
+
                     grab_ent: None,
                     hand_len: 100000.0,
                 },
