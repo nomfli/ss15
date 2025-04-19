@@ -1,8 +1,5 @@
-
-
 use crate::{
     client::render::hands::{SendTryThrow, TryToGrabEvent},
-
     shared::{messages::ClientMessages, resource::MovementInput},
 };
 
@@ -34,7 +31,7 @@ pub(crate) fn client_send_movement(
 }
 
 pub(crate) fn send_grabbing(
-    mut reader: EventReader<TryToGrabbEvent>,
+    mut reader: EventReader<TryToGrabEvent>,
     mut client: ResMut<RenetClient>,
 ) {
     for event in reader.read() {
@@ -61,4 +58,3 @@ pub(crate) fn send_try_to_throw(
         client.send_message(DefaultChannel::Unreliable, throw_msg);
     }
 }
-

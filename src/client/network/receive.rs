@@ -1,11 +1,9 @@
 use crate::client::render::{
-
     connection::PlayerConnected, hands::ShouldGrab, movement::ChangePositions,
-
 };
 use crate::shared::{
     components::Grabbable,
-    events::ThrowAnswerEv,
+    events::ThrowAnswerEvent,
     messages::ServerMessages,
     resource::{Entities, Lobby},
     sprites::{SpriteName, Sprites},
@@ -32,8 +30,7 @@ pub(crate) fn receive_message(
         EventWriter<ChangePositions>,
         EventWriter<PlayerConnected>,
         EventWriter<ShouldGrab>,
-        EventWriter<ThrowAnswerEv>,
-
+        EventWriter<ThrowAnswerEvent>,
     ),
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
@@ -65,7 +62,6 @@ pub(crate) fn receive_message(
                     continue;
                 };
                 let client_ent_id = commands
-
                     .spawn(Transform {
                         translation: Vec3::new(x, y, 0.0),
                         ..Default::default()
@@ -77,10 +73,9 @@ pub(crate) fn receive_message(
                 ents.entities.insert(client_ent_id, ent);
             }
             Ok(ServerMessages::GrabAnswer(ent, id)) => {
-
                 grab_event.send(ShouldGrab {
                     i_must_be_grabbed: ent,
-                    who_should_grabe: id,
+                    who_should_grab: id,
                 });
             }
             Ok(ServerMessages::ThrowAnswer {
@@ -88,13 +83,11 @@ pub(crate) fn receive_message(
                 hand_idx,
                 where_throw,
             }) => {
-                throw_ev.send(ThrowAnswerEv {
+                throw_ev.send(ThrowAnswerEvent {
                     client: client_id,
                     hand_idx,
                     where_throw,
                 });
-
-
             }
             _ => {}
         }

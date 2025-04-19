@@ -2,11 +2,9 @@ use crate::{
     client::render::input::Mouse,
     shared::{
         components::{Grabbable, Hands, PlayerEntity},
-
-        events::ThrowAnswerEv,
+        events::ThrowAnswerEvent,
         resource::{Entities, Lobby},
         sprites::{SpriteName, Sprites},
-
     },
 };
 use bevy::prelude::*;
@@ -16,7 +14,6 @@ pub struct HandsClientPlug;
 
 impl Plugin for HandsClientPlug {
     fn build(&self, app: &mut App) {
-
         app.add_event::<ShouldGrab>();
         app.add_event::<TryToGrabEvent>();
         app.add_event::<SendTryThrow>();
@@ -25,7 +22,6 @@ impl Plugin for HandsClientPlug {
         app.add_systems(Update, try_to_grab);
         app.add_systems(Update, grab_event_handler);
         app.add_systems(Update, try_throw);
-
     }
 }
 
@@ -46,7 +42,6 @@ pub struct TryToGrabEvent {
     pub hand_idx: usize,
 }
 
-
 pub fn try_to_grab(
     i_want_grab: Query<(&Hands, &PlayerEntity)>,
     can_be_grabed: Query<(&Transform, &Sprite, Entity, &Grabbable)>,
@@ -54,16 +49,15 @@ pub fn try_to_grab(
     mouse_input: Res<Mouse>,
     mut writer: EventWriter<TryToGrabEvent>,
 ) {
-    for (hands, _) in i_want_grabb.iter() {
+    for (hands, _) in i_want_grab.iter() {
         let selected_idx = hands.selected_hand;
         if hands.all_hands[selected_idx].grab_ent.is_some() {
-
             return;
         }
         let Some(cur_pos) = mouse_input.cords else {
             return;
         };
-        for (coords, sprite, ent, grabbable) in can_be_grabbed.iter() {
+        for (coords, sprite, ent, grabbable) in can_be_grabed.iter() {
             if !grabbable.0 {
                 continue;
             }
@@ -93,7 +87,6 @@ pub fn try_to_grab(
 pub struct ShouldGrab {
     pub i_must_be_grabbed: Entity,
     pub who_should_grab: ClientId,
-
 }
 pub fn grab_event_handler(
     lobby: Res<Lobby>,
@@ -125,7 +118,6 @@ pub fn grab_event_handler(
     }
 }
 
-
 #[derive(Event)]
 pub(crate) struct SendTryThrow {
     pub hand_idx: usize,
@@ -140,7 +132,7 @@ pub(crate) fn try_throw(
 ) {
     for (_, hands) in query.iter() {
         let hand_idx = hands.selected_hand;
-        if hands.all_hands[hand_idx].grabb_ent.is_none() {
+        if hands.all_hands[hand_idx].grab_ent.is_none() {
             return;
         }
         let Some(where_throw) = mouse_input.cords else {
@@ -156,7 +148,7 @@ pub(crate) fn try_throw(
 }
 
 pub(crate) fn throw(
-    mut reader: EventReader<ThrowAnswerEv>,
+    mut reader: EventReader<ThrowAnswerEvent>,
     mut commands: Commands,
     mut hands_query: Query<&mut Hands>,
     sprite_query: Query<&SpriteName>,
@@ -189,4 +181,3 @@ pub(crate) fn throw(
         }
     }
 }
-

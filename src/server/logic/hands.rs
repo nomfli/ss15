@@ -15,7 +15,6 @@ impl Plugin for HandsServerPlug {
         app.add_event::<ThrowEvent>();
         app.add_systems(Update, grab_answer_handler);
         app.add_systems(Update, throw_answer);
-
     }
 }
 
@@ -32,7 +31,6 @@ pub(crate) struct GrabAnsEvent {
     pub can_be_grabbed: Entity,
     pub client: ClientId,
 }
-
 
 pub fn grab_answer_handler(
     mut grab_ev: EventReader<GrabEvent>,
@@ -67,7 +65,6 @@ pub fn grab_answer_handler(
         }
     }
 }
-
 
 #[derive(Event, Debug)]
 pub(crate) struct ThrowEvent {
@@ -110,4 +107,3 @@ pub(crate) fn throw_answer(
         }
     }
 }
-
