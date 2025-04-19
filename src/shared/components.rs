@@ -15,3 +15,15 @@ pub struct Player {
 
 #[derive(Clone, Copy, Default, Debug, Component, Serialize, Deserialize)]
 pub struct Grabbable(pub bool);
+
+#[derive(Default, Copy, Clone, Debug, Component, Serialize, Deserialize)]
+pub struct Hand {
+    pub grab_ent: Option<Entity>,
+    pub hand_len: f32,
+}
+
+#[derive(Clone, Default, Debug, Component)]
+pub struct Hands {
+    pub all_hands: Vec<Hand>,
+    pub selected_hand: usize,
+}
