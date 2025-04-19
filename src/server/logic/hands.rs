@@ -7,7 +7,7 @@ pub struct HandsServerPlug;
 impl Plugin for HandsServerPlug {
     fn build(&self, app: &mut App) {
         app.add_event::<GrabEvent>();
-        app.add_event::<GrabAnsEv>();
+        app.add_event::<GrabAnsEvent>();
         app.add_systems(Update, grab_answer_handler);
     }
 }
@@ -21,7 +21,7 @@ pub struct GrabEvent {
 }
 
 #[derive(Event, Debug)]
-pub(crate) struct GrabAnsEv {
+pub(crate) struct GrabAnsEvent {
     pub can_be_grabbed: Entity,
     pub client: ClientId,
 }
@@ -30,7 +30,7 @@ pub fn grab_answer_handler(
     mut grab_ev: EventReader<GrabEvent>,
     mut i_want_grab: Query<(&Transform, &mut Hands)>,
     can_be_grabbed: Query<(&Transform, &Grabbable)>,
-    mut send_grab_ev: EventWriter<GrabAnsEv>,
+    mut send_grab_ev: EventWriter<GrabAnsEvent>,
     mut commands: Commands,
 ) {
     for event in grab_ev.read() {
@@ -44,7 +44,7 @@ pub fn grab_answer_handler(
                         < hands.all_hands[event.hand_idx].hand_len
                 {
                     {
-                        send_grab_ev.send(GrabAnsEv {
+                        send_grab_ev.send(GrabAnsEvent {
                             can_be_grabbed: event.can_be_grabbed,
                             client: event.client,
                         });

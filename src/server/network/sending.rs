@@ -1,5 +1,5 @@
 use crate::{
-    server::logic::hands::GrabAnsEv,
+    server::logic::hands::GrabAnsEvent,
     shared::{
         components::{Grabbable, Player},
         messages::ServerMessages,
@@ -49,7 +49,7 @@ pub(crate) fn send_items(
 
 pub(crate) fn send_grab_answer(
     mut server: ResMut<RenetServer>,
-    mut grab_ansewer: EventReader<GrabAnsEv>,
+    mut grab_ansewer: EventReader<GrabAnsEvent>,
 ) {
     for event in grab_ansewer.read() {
         let Ok(sync_message) = bincode::serialize(&ServerMessages::GrabAnswer(
