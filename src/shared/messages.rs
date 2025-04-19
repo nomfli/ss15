@@ -1,4 +1,3 @@
-
 use crate::shared::{
     components::{Direction, Grabbable, Speed},
     sprites::SpriteName,
@@ -15,7 +14,6 @@ pub enum ServerMessages {
     PlayerDisconnected { id: ClientId },
     SendPositions(HashMap<ClientId, [f32; 2]>),
     AddItem(([f32; 2], SpriteName, Entity, Grabbable)),
-    GrabAnswer(Entity, ClientId),
     Speed(Speed),
     Direction(Direction, Entity),
     GrabAnswer(Entity, ClientId),

@@ -17,8 +17,6 @@ use crate::{
             hands::HandsServerPlug, init::ServerInitPlug, movement::MovementServerPlug,
             rotation::RotServerPlug,
         },
-
-
         network::{
             connection::ConnectionHandlerPlug, init::StartupServerPlug, sending::ServerSendPlug,
             update_server_system::UpdateServerPlug,
