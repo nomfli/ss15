@@ -31,7 +31,6 @@ fn main() {
     let exec_type = args[1].as_str();
     let mut app = App::new();
     app.add_plugins((DefaultPlugins, ResInitPlug, SpritesPlug, SharedEvents));
-
     match exec_type {
         "server" => {
             app.add_plugins((
@@ -45,7 +44,6 @@ fn main() {
                 RotServerPlug,
             ));
         }
-
         "client" => {
             app.add_plugins((
                 ClientInitPlug,
@@ -59,7 +57,6 @@ fn main() {
                 RotClientPlug,
             ));
         }
-
         _ => panic!("incorrect usage"),
     }
     app.run();
