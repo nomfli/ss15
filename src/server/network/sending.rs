@@ -1,11 +1,10 @@
 use crate::{
-    server::logic::hands::GrabAnsEv,
+    server::logic::hands::GrabAnsEvent,
     shared::{
-        components::{Grabbable, Player, Speed},
+        components::{Grabbable, Player},
         messages::ServerMessages,
         sprites::SpriteName,
     },
-
 };
 use bevy::prelude::*;
 use bevy_renet::renet::*;
@@ -17,7 +16,6 @@ impl Plugin for ServerSendPlug {
         app.add_systems(Update, send_items);
         app.add_systems(Update, send_grab_answer);
         app.add_systems(Update, send_speed);
-
         app.add_event::<SendItems>();
     }
 }
@@ -53,7 +51,7 @@ pub(crate) fn send_items(
 
 pub(crate) fn send_grab_answer(
     mut server: ResMut<RenetServer>,
-    mut grab_ansewer: EventReader<GrabAnsEv>,
+    mut grab_ansewer: EventReader<GrabAnsEvent>,
 ) {
     for event in grab_ansewer.read() {
         let Ok(sync_message) = bincode::serialize(&ServerMessages::GrabAnswer(

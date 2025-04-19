@@ -1,14 +1,15 @@
 
+
 use crate::client::render::{
     connection::PlayerConnected,
-    hands::ShouldGrabb,
+    hands::ShouldGrab,
     movement::{ChangePositions, SpeedEvent},
+
 };
 use crate::shared::{
     components::Grabbable,
     messages::ServerMessages,
     resource::{Entities, Lobby},
-
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -26,15 +27,15 @@ pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
-
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
     (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut speed_event): (
         EventWriter<ChangePositions>,
         EventWriter<PlayerConnected>,
-        EventWriter<ShouldGrabb>,
+        EventWriter<ShouldGrab>,
         EventWriter<SpeedEvent>,
     ),
+
 
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
@@ -61,13 +62,11 @@ pub(crate) fn receive_message(
             Ok(ServerMessages::AddItem(item)) => {
                 //need to
                 //incapsulate
-
                 let ([x, y], name, ent, grabbable) = item;
                 let Some(sprite) = sprites.0.get(&name.0) else {
                     continue;
                 };
                 let client_ent_id = commands
-
                     .spawn(Transform {
                         translation: Vec3::new(x, y, 0.0),
                         ..Default::default()
@@ -79,13 +78,14 @@ pub(crate) fn receive_message(
                 ents.entities.insert(client_ent_id, ent);
             }
             Ok(ServerMessages::GrabAnswer(ent, id)) => {
-                grab_event.send(ShouldGrabb {
+                grab_event.send(ShouldGrab {
                     i_must_be_grabbed: ent,
-                    who_should_grabe: id,
+                    who_should_grab: id,
                 });
             }
             Ok(ServerMessages::Speed(speed)) => {
                 speed_event.send(SpeedEvent(speed));
+
 
             }
             _ => {}

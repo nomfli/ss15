@@ -15,11 +15,10 @@ pub enum ServerMessages {
     PlayerDisconnected { id: ClientId },
     SendPositions(HashMap<ClientId, [f32; 2]>),
     AddItem(([f32; 2], SpriteName, Entity, Grabbable)),
-
     GrabAnswer(Entity, ClientId),
     Speed(Speed),
     Direction(Direction, Entity),
-
+    GrabAnswer(Entity, ClientId),
 }
 
 #[derive(Debug, Serialize, Deserialize, Component)]
@@ -36,5 +35,4 @@ pub enum ClientMessages {
         hand_idx: usize,
     },
     Direction(Direction),
-
 }

@@ -40,7 +40,6 @@ pub fn init_sprites(
 
         },
     );
-
     let adrenalin = "adrenalin".to_string();
 
     sprites.0.insert(
