@@ -17,6 +17,7 @@ pub struct Sprites(pub HashMap<String, Sprite>);
 #[derive(Debug, Default, Component, Deserialize, Serialize, Clone)]
 pub struct SpriteName(pub String);
 
+
 pub fn init_sprites(
     mut sprites: ResMut<Sprites>,
     asset_server: Res<AssetServer>,
@@ -36,10 +37,12 @@ pub fn init_sprites(
             }),
             custom_size: Some(Vec2::new(32.0, 32.0)),
             ..default()
+
         },
     );
 
     let adrenalin = "adrenalin".to_string();
+
     sprites.0.insert(
         adrenalin,
         Sprite::from_image(asset_server.load("./images/adrenalin.png")),

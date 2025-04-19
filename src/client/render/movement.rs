@@ -2,6 +2,7 @@ use crate::shared::{
     components::{PlayerEntity, Speed},
     resource::Lobby,
 };
+
 use bevy::prelude::*;
 use std::collections::HashMap;
 
@@ -40,6 +41,7 @@ pub(crate) fn change_position(
     }
 }
 
+
 #[derive(Default, Debug, Clone, Event)]
 pub(crate) struct SpeedEvent(pub Speed);
 
@@ -54,3 +56,4 @@ pub(crate) fn change_speed(
         }
     }
 }
+

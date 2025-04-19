@@ -1,3 +1,4 @@
+
 use crate::client::render::{
     connection::PlayerConnected,
     hands::ShouldGrabb,
@@ -7,6 +8,7 @@ use crate::shared::{
     components::Grabbable,
     messages::ServerMessages,
     resource::{Entities, Lobby},
+
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -24,6 +26,7 @@ pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
+
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
     (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut speed_event): (
@@ -32,6 +35,7 @@ pub(crate) fn receive_message(
         EventWriter<ShouldGrabb>,
         EventWriter<SpeedEvent>,
     ),
+
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -57,11 +61,13 @@ pub(crate) fn receive_message(
             Ok(ServerMessages::AddItem(item)) => {
                 //need to
                 //incapsulate
+
                 let ([x, y], name, ent, grabbable) = item;
                 let Some(sprite) = sprites.0.get(&name.0) else {
                     continue;
                 };
                 let client_ent_id = commands
+
                     .spawn(Transform {
                         translation: Vec3::new(x, y, 0.0),
                         ..Default::default()
@@ -80,6 +86,7 @@ pub(crate) fn receive_message(
             }
             Ok(ServerMessages::Speed(speed)) => {
                 speed_event.send(SpeedEvent(speed));
+
             }
             _ => {}
         }

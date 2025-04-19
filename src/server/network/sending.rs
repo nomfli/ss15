@@ -5,6 +5,7 @@ use crate::{
         messages::ServerMessages,
         sprites::SpriteName,
     },
+
 };
 use bevy::prelude::*;
 use bevy_renet::renet::*;
@@ -16,6 +17,7 @@ impl Plugin for ServerSendPlug {
         app.add_systems(Update, send_items);
         app.add_systems(Update, send_grab_answer);
         app.add_systems(Update, send_speed);
+
         app.add_event::<SendItems>();
     }
 }
@@ -48,6 +50,7 @@ pub(crate) fn send_items(
     }
 }
 
+
 pub(crate) fn send_grab_answer(
     mut server: ResMut<RenetServer>,
     mut grab_ansewer: EventReader<GrabAnsEv>,
@@ -70,3 +73,4 @@ pub(crate) fn send_speed(query: Query<(&Player, &Speed)>, mut server: ResMut<Ren
         }
     }
 }
+

@@ -1,6 +1,8 @@
 use crate::shared::{
+
     components::{Direction, Hand, Hands, PlayerEntity},
     resource::{Entities, Lobby},
+
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -27,7 +29,9 @@ pub(crate) fn player_connected(
     client_transport: Res<NetcodeClientTransport>,
     mut commands: Commands,
     sprites: Res<Sprites>,
+
     mut ents: ResMut<Entities>,
+
 ) {
     for event in player_connected_ev.read() {
         let client_id = event.client_id;
@@ -38,11 +42,14 @@ pub(crate) fn player_connected(
             commands.entity(player_entity_id).insert(PlayerEntity);
         }
         lobby.players.insert(client_id, player_entity_id);
+
         ents.entities.insert(player_entity_id, event.ent_id);
+
     }
 }
 
 fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sprites>) -> Entity {
+
     if let Some(sprite) = sprites.0.get("human") {
         let player_entity_id = commands
             .spawn(SpriteName("human".to_string()))
@@ -61,10 +68,12 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
                 selected_hand: 0,
             })
             .insert(Direction::Down)
+
             .id();
 
         player_entity_id
     } else {
         panic!("Missing sprite 'human' for entity ID {:?}", ent_id);
+
     }
 }

@@ -16,6 +16,7 @@ pub struct Player {
 #[derive(Clone, Copy, Default, Debug, Component, Serialize, Deserialize)]
 pub struct Grabbable(pub bool);
 
+
 #[derive(Default, Copy, Clone, Debug, Component, Serialize, Deserialize)]
 pub struct Hand {
     pub grabb_ent: Option<Entity>,
@@ -41,4 +42,4 @@ pub(crate) enum Direction {
     Down,
     Left,
     Right,
-}
+
