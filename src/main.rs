@@ -4,10 +4,12 @@ mod client;
 mod server;
 mod shared;
 
+
 use crate::{
     client::{
         network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
         render::{
+
             connection::ConnectionPlug, hands::HandsClientPlug, init::InitRenderPlug,
             input::InputClientPlug, movement::MovementClientPlug, rotation::RotClientPlug,
         },
@@ -17,6 +19,7 @@ use crate::{
             hands::HandsServerPlug, init::ServerInitPlug, movement::MovementServerPlug,
             rotation::RotServerPlug,
         },
+
         network::{
             connection::ConnectionHandlerPlug, init::StartupServerPlug, sending::ServerSendPlug,
             update_server_system::UpdateServerPlug,
@@ -43,6 +46,7 @@ fn main() {
                 UpdateServerPlug,
                 HandsServerPlug,
                 RotServerPlug,
+
             ));
         }
 
@@ -57,6 +61,7 @@ fn main() {
                 MovementClientPlug,
                 HandsClientPlug,
                 RotClientPlug,
+
             ));
         }
 

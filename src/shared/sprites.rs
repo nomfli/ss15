@@ -36,10 +36,12 @@ pub fn init_sprites(
             }),
             custom_size: Some(Vec2::new(32.0, 32.0)),
             ..default()
+
         },
     );
 
     let adrenalin = "adrenalin".to_string();
+
     sprites.0.insert(
         adrenalin,
         Sprite::from_image(asset_server.load("./images/adrenalin.png")),
