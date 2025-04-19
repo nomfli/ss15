@@ -10,6 +10,8 @@ impl Plugin for InputClientPlug {
         app.add_systems(Update, mouse_coords_to_world);
         app.add_systems(Update, mouse_coords_to_world);
         app.init_resource::<Mouse>();
+
+
     }
 }
 
@@ -57,3 +59,4 @@ pub fn mouse_coords_to_world(
         mouse.cords = None;
     }
 }
+

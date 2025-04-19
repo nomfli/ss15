@@ -1,7 +1,9 @@
 use crate::{
+
     server::logic::hands::GrabAnsEvent,
     shared::{
         components::{Grabbable, Player, Speed},
+        events::ThrowAnswerEvent,
         messages::ServerMessages,
         sprites::SpriteName,
     },
@@ -16,6 +18,7 @@ impl Plugin for ServerSendPlug {
         app.add_systems(Update, send_items);
         app.add_systems(Update, send_grab_answer);
         app.add_systems(Update, send_speed);
+        app.add_systems(Update, send_throw_answer);
         app.add_event::<SendItems>();
     }
 }
@@ -57,7 +60,7 @@ pub(crate) fn send_grab_answer(
             event.can_be_grabbed,
             event.client,
         )) else {
-            return;
+            continue;
         };
         server.broadcast_message(DefaultChannel::Unreliable, sync_message);
     }
@@ -70,3 +73,22 @@ pub(crate) fn send_speed(query: Query<(&Player, &Speed)>, mut server: ResMut<Ren
         }
     }
 }
+
+
+pub(crate) fn send_throw_answer(
+    mut server: ResMut<RenetServer>,
+    mut throw_answer: EventReader<ThrowAnswerEvent>,
+) {
+    for event in throw_answer.read() {
+        let Ok(throw_msg) = bincode::serialize(&ServerMessages::ThrowAnswer {
+            client_id: event.client,
+            where_throw: event.where_throw,
+            hand_idx: event.hand_idx,
+        }) else {
+            continue;
+        };
+        server.broadcast_message(DefaultChannel::Unreliable, throw_msg);
+    }
+}
+
+

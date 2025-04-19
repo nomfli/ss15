@@ -10,7 +10,7 @@ pub struct ConnectionPlug;
 
 impl Plugin for ConnectionPlug {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, player_connected);
+        app.add_systems(PreUpdate, player_connected);
         app.add_event::<PlayerConnected>();
     }
 }
@@ -28,6 +28,7 @@ pub(crate) fn player_connected(
     mut commands: Commands,
     sprites: Res<Sprites>,
     mut ents: ResMut<Entities>,
+
 ) {
     for event in player_connected_ev.read() {
         let client_id = event.client_id;
@@ -58,6 +59,7 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
                     },
                     Hand {
                         grab_ent: None,
+
                         hand_len: 100000.0,
                     },
                 ],
