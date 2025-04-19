@@ -2,6 +2,7 @@ use crate::{
     client::render::hands::TryToGrabbEvent,
     shared::{messages::ClientMessages, resource::MovementInput},
 };
+
 use bevy::prelude::*;
 use bevy_renet::renet::*;
 
@@ -28,6 +29,7 @@ pub(crate) fn client_send_movement(
     }
 }
 
+
 pub(crate) fn send_grabbing(
     mut reader: EventReader<TryToGrabbEvent>,
     mut client: ResMut<RenetClient>,
@@ -41,3 +43,4 @@ pub(crate) fn send_grabbing(
         }
     }
 }
+

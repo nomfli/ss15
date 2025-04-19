@@ -29,6 +29,7 @@ pub(crate) fn receive_message(
         EventWriter<PlayerConnected>,
         EventWriter<ShouldGrabb>,
     ),
+
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -58,8 +59,7 @@ pub(crate) fn receive_message(
                 let Some(sprite) = sprites.0.get(&name.0) else {
                     continue;
                 };
-                let client_ent_id = commands
-                    .spawn(Transform {
+                let client_ent_id = commands.spawn(Transform {
                         translation: Vec3::new(x, y, 0.0),
                         ..Default::default()
                     })
@@ -74,6 +74,8 @@ pub(crate) fn receive_message(
                     i_must_be_grabbed: ent,
                     who_should_grabe: id,
                 });
+
+
             }
             _ => {}
         }

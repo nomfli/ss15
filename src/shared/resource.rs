@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::hash::Hash;
 
+
 pub struct ResInitPlug;
 
 impl Plugin for ResInitPlug {
@@ -13,6 +14,7 @@ impl Plugin for ResInitPlug {
         app.insert_resource(Entities {
             entities: Bimap::new(),
         });
+
     }
 }
 
@@ -28,6 +30,7 @@ pub struct MovementInput {
     pub left: bool,
     pub right: bool,
 }
+
 
 #[derive(Debug, Default)]
 pub struct Bimap<T, V> {
@@ -65,3 +68,4 @@ where
 pub(crate) struct Entities {
     pub entities: Bimap<Entity, Entity>, //from client to server
 }
+

@@ -45,7 +45,7 @@ pub(crate) fn send_items(
             }
         }
     }
-}
+
 
 pub(crate) fn send_grab_answer(
     mut server: ResMut<RenetServer>,
@@ -61,3 +61,4 @@ pub(crate) fn send_grab_answer(
         server.broadcast_message(DefaultChannel::Unreliable, sync_message);
     }
 }
+

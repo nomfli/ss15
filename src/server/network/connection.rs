@@ -1,9 +1,11 @@
 use crate::server::logic::movement::*;
+
 use crate::shared::{
     components::{Hand, Hands, Player},
     messages::ServerMessages,
     resource::Lobby,
 };
+
 use bevy::prelude::*;
 use bevy_renet::renet::*;
 
@@ -70,6 +72,7 @@ pub(crate) fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> E
             ..Default::default()
         })
         .insert(Player { id: *client_id })
+
         .insert(Hands {
             all_hands: vec![
                 Hand {
@@ -83,6 +86,7 @@ pub(crate) fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> E
             ],
             selected_hand: 0,
         })
+
         .insert(Acceleration(ACCELERATION))
         .insert(MaxSpeed(MAX_MOVE_SPEED))
         .insert(Speed { x: 0.0, y: 0.0 })

@@ -1,6 +1,7 @@
 use crate::shared::resource::MovementInput;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+
 pub struct InputClientPlug;
 
 impl Plugin for InputClientPlug {
@@ -25,6 +26,7 @@ pub(crate) fn movement_input(
     player_input.down =
         keyboard_input.pressed(KeyCode::KeyS) || keyboard_input.pressed(KeyCode::ArrowDown);
 }
+
 
 #[derive(Clone, Copy, Default, Debug, Resource)]
 pub struct Mouse {
