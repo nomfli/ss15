@@ -1,5 +1,5 @@
 use crate::{
-    client::render::hands::TryToGrabbEvent,
+    client::render::hands::TryToGrabEvent,
     shared::{messages::ClientMessages, resource::MovementInput},
 };
 
@@ -29,18 +29,16 @@ pub(crate) fn client_send_movement(
     }
 }
 
-
 pub(crate) fn send_grabbing(
-    mut reader: EventReader<TryToGrabbEvent>,
+    mut reader: EventReader<TryToGrabEvent>,
     mut client: ResMut<RenetClient>,
 ) {
     for event in reader.read() {
-        if let Ok(grabb_msg) = bincode::serialize(&ClientMessages::Grab {
+        if let Ok(grab_msg) = bincode::serialize(&ClientMessages::Grab {
             can_be_grabbed: event.can_be_grabbed,
             hand_idx: event.hand_idx,
         }) {
-            client.send_message(DefaultChannel::Unreliable, grabb_msg);
+            client.send_message(DefaultChannel::Unreliable, grab_msg);
         }
     }
 }
-

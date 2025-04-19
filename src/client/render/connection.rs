@@ -1,7 +1,6 @@
 use crate::shared::{
     components::{Hand, Hands, PlayerEntity},
     resource::{Entities, Lobby},
-
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -30,7 +29,6 @@ pub(crate) fn player_connected(
     sprites: Res<Sprites>,
 
     mut ents: ResMut<Entities>,
-
 ) {
     for event in player_connected_ev.read() {
         let client_id = event.client_id;
@@ -42,7 +40,6 @@ pub(crate) fn player_connected(
         }
         lobby.players.insert(client_id, player_entity_id);
         ents.entities.insert(player_entity_id, event.ent_id);
-
     }
 }
 
@@ -54,11 +51,11 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
             .insert(Hands {
                 all_hands: vec![
                     Hand {
-                        grabb_ent: None,
+                        grab_ent: None,
                         hand_len: 100000.0,
                     },
                     Hand {
-                        grabb_ent: None,
+                        grab_ent: None,
                         hand_len: 100000.0,
                     },
                 ],

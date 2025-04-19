@@ -14,7 +14,6 @@ use crate::{
     },
     server::{
         logic::{hands::HandsServerPlug, init::ServerInitPlug, movement::MovementServerPlug},
-
         network::{
             connection::ConnectionHandlerPlug, init::StartupServerPlug, sending::ServerSendPlug,
             update_server_system::UpdateServerPlug,
@@ -40,7 +39,6 @@ fn main() {
                 ServerSendPlug,
                 UpdateServerPlug,
                 HandsServerPlug,
-
             ));
         }
 

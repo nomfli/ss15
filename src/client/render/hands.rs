@@ -12,10 +12,10 @@ pub struct HandsClientPlug;
 
 impl Plugin for HandsClientPlug {
     fn build(&self, app: &mut App) {
-        app.add_event::<ShouldGrabb>();
-        app.add_event::<TryToGrabbEvent>();
+        app.add_event::<ShouldGrab>();
+        app.add_event::<TryToGrabEvent>();
         app.add_systems(Update, change_hand);
-        app.add_systems(Update, try_to_grabb);
+        app.add_systems(Update, try_to_grab);
         app.add_systems(Update, grab_event_handler);
     }
 }
@@ -32,21 +32,21 @@ pub fn change_hand(
 }
 
 #[derive(Event)]
-pub struct TryToGrabbEvent {
+pub struct TryToGrabEvent {
     pub can_be_grabbed: Entity, //server Entity
     pub hand_idx: usize,
 }
 
-pub fn try_to_grabb(
-    i_want_grabb: Query<(&Hands, &PlayerEntity)>,
+pub fn try_to_grab(
+    i_want_grab: Query<(&Hands, &PlayerEntity)>,
     can_be_grabbed: Query<(&Transform, &Sprite, Entity, &Grabbable)>,
     entities: Res<Entities>,
     mouse_input: Res<Mouse>,
-    mut writer: EventWriter<TryToGrabbEvent>,
+    mut writer: EventWriter<TryToGrabEvent>,
 ) {
-    for (hands, _) in i_want_grabb.iter() {
+    for (hands, _) in i_want_grab.iter() {
         let selected_idx = hands.selected_hand;
-        if hands.all_hands[selected_idx].grabb_ent.is_some() {
+        if hands.all_hands[selected_idx].grab_ent.is_some() {
             return;
         }
         let Some(cur_pos) = mouse_input.cords else {
@@ -68,7 +68,7 @@ pub fn try_to_grabb(
                 let Some(server_ent) = entities.entities.get_by_first(&ent) else {
                     panic!("problem with bimap entities can't find entity");
                 };
-                writer.send(TryToGrabbEvent {
+                writer.send(TryToGrabEvent {
                     can_be_grabbed: *server_ent,
                     hand_idx: selected_idx,
                 });
@@ -77,19 +77,19 @@ pub fn try_to_grabb(
     }
 }
 #[derive(Event, Debug)]
-pub struct ShouldGrabb {
+pub struct ShouldGrab {
     pub i_must_be_grabbed: Entity,
-    pub who_should_grabe: ClientId,
+    pub who_should_grab: ClientId,
 }
 pub fn grab_event_handler(
     lobby: Res<Lobby>,
     entities: Res<Entities>,
-    mut grab_event: EventReader<ShouldGrabb>,
+    mut grab_event: EventReader<ShouldGrab>,
     mut query: Query<&mut Hands>,
     mut commands: Commands,
 ) {
     for event in grab_event.read() {
-        let Some(&player_entity) = lobby.players.get(&event.who_should_grabe) else {
+        let Some(&player_entity) = lobby.players.get(&event.who_should_grab) else {
             continue;
         };
         let Ok(mut hands) = query.get_mut(player_entity) else {
@@ -104,7 +104,7 @@ pub fn grab_event_handler(
         }
 
         let selected_idx = hands.selected_hand;
-        hands.all_hands[selected_idx].grabb_ent = Some(must_be_grabbed);
+        hands.all_hands[selected_idx].grab_ent = Some(must_be_grabbed);
 
         commands
             .entity(must_be_grabbed)
