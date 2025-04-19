@@ -17,14 +17,27 @@ pub struct Sprites(pub HashMap<String, Sprite>);
 #[derive(Debug, Default, Component, Deserialize, Serialize, Clone)]
 pub struct SpriteName(pub String);
 
-pub fn init_sprites(mut sprites: ResMut<Sprites>, asset_server: Res<AssetServer>) {
-    let red_sqr = "red_sqr".to_string();
+
+pub fn init_sprites(
+    mut sprites: ResMut<Sprites>,
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
+) {
+    let human = "human".to_string();
+    let texture: Handle<Image> = asset_server.load("./images/human.png");
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(64, 64), 2, 2, None, None);
+    let layout_handle = texture_atlases.add(layout);
     sprites.0.insert(
-        red_sqr,
+        human,
         Sprite {
+            image: texture,
+            texture_atlas: Some(TextureAtlas {
+                layout: layout_handle,
+                index: 2,
+            }),
             custom_size: Some(Vec2::new(32.0, 32.0)),
-            color: Color::srgb_u8(255, 0, 0),
-            ..Default::default()
+            ..default()
+
         },
     );
     let adrenalin = "adrenalin".to_string();

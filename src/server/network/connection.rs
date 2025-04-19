@@ -1,7 +1,6 @@
 use crate::server::logic::movement::*;
-
 use crate::shared::{
-    components::{Hand, Hands, Player},
+    components::{Hand, Hands, Player, Speed},
     messages::ServerMessages,
     resource::Lobby,
 };
