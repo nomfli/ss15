@@ -50,7 +50,6 @@ pub(crate) fn send_items(
     }
 }
 
-
 pub(crate) fn send_grab_answer(
     mut server: ResMut<RenetServer>,
     mut grab_ansewer: EventReader<GrabAnsEvent>,
@@ -66,13 +65,13 @@ pub(crate) fn send_grab_answer(
     }
 }
 
-
 pub(crate) fn send_speed(query: Query<(&Player, &Speed)>, mut server: ResMut<RenetServer>) {
     for (player, speed) in query.iter() {
         if let Ok(speed_msg) = bincode::serialize(&ServerMessages::Speed(*speed)) {
             server.send_message(player.id, DefaultChannel::Unreliable, speed_msg);
         }
-
+    }
+}
 
 pub(crate) fn send_throw_answer(
     mut server: ResMut<RenetServer>,
@@ -89,4 +88,3 @@ pub(crate) fn send_throw_answer(
         server.broadcast_message(DefaultChannel::Unreliable, throw_msg);
     }
 }
-

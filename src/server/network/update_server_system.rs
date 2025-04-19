@@ -1,6 +1,8 @@
 use crate::server::{
-    logic::{hands::{GrabEvent, ThrowEvent}, rotation::DirectionEvent},
-
+    logic::{
+        hands::{GrabEvent, ThrowEvent},
+        rotation::DirectionEvent,
+    },
     network::{connection::*, sending::SendItems},
 };
 
@@ -61,6 +63,7 @@ pub(crate) fn message_handler(
     mut server: ResMut<RenetServer>,
     mut grab_ev: EventWriter<GrabEvent>,
     mut throw_ev: EventWriter<ThrowEvent>,
+    mut dir_ev: EventWriter<DirectionEvent>,
 ) {
     for client_id in server.clients_id() {
         while let Some(message) = server.receive_message(client_id, DefaultChannel::Unreliable) {
@@ -102,6 +105,8 @@ pub(crate) fn message_handler(
                     dir_ev.send(DirectionEvent {
                         client: client_id,
                         direction: dir,
+                    });
+                }
                 Ok(ClientMessages::Throw {
                     selected_idx,
                     where_throw,
@@ -116,7 +121,6 @@ pub(crate) fn message_handler(
                         where_throw,
                     });
                 }
-
 
                 Err(_) => {}
             }
