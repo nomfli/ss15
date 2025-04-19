@@ -5,6 +5,7 @@ use crate::shared::{
     components::Grabbable,
     messages::ServerMessages,
     resource::{Entities, Lobby},
+
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -29,6 +30,7 @@ pub(crate) fn receive_message(
         EventWriter<PlayerConnected>,
         EventWriter<ShouldGrabb>,
     ),
+
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -48,6 +50,7 @@ pub(crate) fn receive_message(
     while let Some(message) = client.receive_message(DefaultChannel::Unreliable) {
         match bincode::deserialize(&message) {
             Ok(ServerMessages::SendPositions(players)) => {
+
                 let updates: Vec<_> = players
                     .iter()
                     .filter_map(|(ent, cords)| {
@@ -59,6 +62,7 @@ pub(crate) fn receive_message(
                 for (client_ent, cords) in updates {
                     positions.0.insert(client_ent, cords);
                 }
+
             }
 
             Ok(ServerMessages::AddItem(item)) => {
@@ -69,12 +73,13 @@ pub(crate) fn receive_message(
                     continue;
                 };
                 let client_ent_id = commands
-                    .spawn(Transform {
+      .spawn(Transform {
                         translation: Vec3::new(x, y, 0.0),
                         ..Default::default()
                     })
                     .insert(SpriteName(name.0))
                     .insert(Grabbable(grabbable.0))
+
                     .insert(sprite.clone())
                     .id();
                 ents.entities.insert(client_ent_id, ent);
@@ -84,6 +89,7 @@ pub(crate) fn receive_message(
                     i_must_be_grabbed: ent,
                     who_should_grabe: id,
                 });
+
             }
             _ => {}
         }

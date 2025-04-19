@@ -10,6 +10,7 @@ impl Plugin for MovementClientPlug {
     }
 }
 
+
 #[derive(Default, Debug, Clone, Resource)]
 pub(crate) struct ChangePositions(pub HashMap<Entity, [f32; 2]>);
 
