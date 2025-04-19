@@ -1,3 +1,4 @@
+
 use bevy::prelude::*;
 use std::collections::HashMap;
 
@@ -9,6 +10,7 @@ impl Plugin for MovementClientPlug {
         app.add_systems(Update, change_position);
     }
 }
+
 
 #[derive(Default, Debug, Clone, Resource)]
 pub(crate) struct ChangePositions(pub HashMap<Entity, [f32; 2]>);
@@ -22,5 +24,6 @@ pub(crate) fn change_position(change_pos: Res<ChangePositions>, mut commands: Co
             ..Default::default()
         };
         commands.entity(*ent).insert(transform);
+
     }
 }

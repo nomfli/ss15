@@ -1,14 +1,17 @@
 use crate::shared::resource::MovementInput;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+
 pub struct InputClientPlug;
 
 impl Plugin for InputClientPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, movement_input);
+
         app.add_systems(Update, mouse_coords_to_world);
         app.add_systems(Update, mouse_coords_to_world);
         app.init_resource::<Mouse>();
+
     }
 }
 
@@ -25,6 +28,7 @@ pub(crate) fn movement_input(
     player_input.down =
         keyboard_input.pressed(KeyCode::KeyS) || keyboard_input.pressed(KeyCode::ArrowDown);
 }
+
 
 #[derive(Clone, Copy, Default, Debug, Resource)]
 pub struct Mouse {
@@ -55,3 +59,4 @@ pub fn mouse_coords_to_world(
         mouse.cords = None;
     }
 }
+

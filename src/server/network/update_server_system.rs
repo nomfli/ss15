@@ -2,6 +2,7 @@ use crate::server::{
     logic::hands::GrabEvent,
     network::{connection::*, sending::SendItems},
 };
+
 use crate::shared::{
     messages::*,
     resource::{Lobby, MovementInput},
@@ -58,6 +59,7 @@ pub(crate) fn message_handler(
     lobby: Res<Lobby>,
     mut server: ResMut<RenetServer>,
     mut grap_ev: EventWriter<GrabEvent>,
+
 ) {
     for client_id in server.clients_id() {
         while let Some(message) = server.receive_message(client_id, DefaultChannel::Unreliable) {
@@ -93,6 +95,7 @@ pub(crate) fn message_handler(
                         client: client_id,
                     });
                 }
+
                 Err(_) => {}
             }
         }

@@ -1,3 +1,4 @@
+
 use crate::client::render::{
     connection::PlayerConnected, hands::ShouldGrabb, movement::ChangePositions,
 };
@@ -5,6 +6,7 @@ use crate::shared::{
     components::Grabbable,
     messages::ServerMessages,
     resource::{Entities, Lobby},
+
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -22,6 +24,7 @@ pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
+
     mut positions: ResMut<ChangePositions>,
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
@@ -29,6 +32,7 @@ pub(crate) fn receive_message(
         EventWriter<PlayerConnected>,
         EventWriter<ShouldGrabb>,
     ),
+
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -48,6 +52,7 @@ pub(crate) fn receive_message(
     while let Some(message) = client.receive_message(DefaultChannel::Unreliable) {
         match bincode::deserialize(&message) {
             Ok(ServerMessages::SendPositions(players)) => {
+
                 let updates: Vec<_> = players
                     .iter()
                     .filter_map(|(ent, cords)| {
@@ -59,16 +64,19 @@ pub(crate) fn receive_message(
                 for (client_ent, cords) in updates {
                     positions.0.insert(client_ent, cords);
                 }
+
             }
 
             Ok(ServerMessages::AddItem(item)) => {
                 //need to
                 //incapsulate
+
                 let ([x, y], name, ent, grabbable) = item;
                 let Some(sprite) = sprites.0.get(&name.0) else {
                     continue;
                 };
                 let client_ent_id = commands
+
                     .spawn(Transform {
                         translation: Vec3::new(x, y, 0.0),
                         ..Default::default()
@@ -84,6 +92,7 @@ pub(crate) fn receive_message(
                     i_must_be_grabbed: ent,
                     who_should_grabe: id,
                 });
+
             }
             _ => {}
         }
