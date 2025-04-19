@@ -13,7 +13,7 @@ pub(crate) struct Speed {
     pub y: f32,
 }
 
-#[derive(Resource, Debug, Default, Serialize, Deserialize)]
+#[derive(Resource, Debug, Default, Serialize, Deserialize, Clone)]
 pub(crate) struct Positions(pub HashMap<ClientId, [f32; 2]>);
 
 #[derive(Component, Debug, Default, Serialize, Deserialize)]
