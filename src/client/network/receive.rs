@@ -90,9 +90,9 @@ pub(crate) fn receive_message(
                     hand_idx,
                     where_throw,
                 });
+            }
             Ok(ServerMessages::Speed(speed)) => {
                 speed_event.send(SpeedEvent(speed));
-
             }
             _ => {}
         }
