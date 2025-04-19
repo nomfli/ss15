@@ -23,10 +23,9 @@ pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
-
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
-    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut throw_ev): (
+    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut throw_event): (
         EventWriter<ChangePositions>,
         EventWriter<PlayerConnected>,
         EventWriter<ShouldGrab>,
@@ -83,7 +82,7 @@ pub(crate) fn receive_message(
                 hand_idx,
                 where_throw,
             }) => {
-                throw_ev.send(ThrowAnswerEvent {
+                throw_event.send(ThrowAnswerEvent {
                     client: client_id,
                     hand_idx,
                     where_throw,

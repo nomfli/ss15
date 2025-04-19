@@ -12,7 +12,7 @@ impl Plugin for ClientSendingPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, client_send_movement);
         app.add_systems(Update, send_grabbing);
-        app.add_systems(Update, send_try_to_throw);
+        app.add_systems(Update, send_try_throw);
     }
 }
 
@@ -44,7 +44,7 @@ pub(crate) fn send_grabbing(
     }
 }
 
-pub(crate) fn send_try_to_throw(
+pub(crate) fn send_try_throw(
     mut ev_reader: EventReader<SendTryThrow>,
     mut client: ResMut<RenetClient>,
 ) {
