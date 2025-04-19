@@ -6,7 +6,6 @@ use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize, Component)]
 pub enum ServerMessages {
-
     PlayerConnected {
         client_id: ClientId,
         ent_id: Entity,
@@ -36,9 +35,9 @@ pub enum ClientMessages {
         can_be_grabbed: Entity,
         hand_idx: usize,
     },
+
     Throw {
         selected_idx: usize,
         where_throw: Vec2,
     },
-
 }

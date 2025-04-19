@@ -1,8 +1,9 @@
 use crate::{
-    server::logic::hands::GrabAnsEv,
+
+    server::logic::hands::GrabAnsEvent,
     shared::{
         components::{Grabbable, Player},
-        events::ThrowAnswerEv,
+        events::ThrowAnswerEvent,
         messages::ServerMessages,
         sprites::SpriteName,
     },
@@ -51,7 +52,7 @@ pub(crate) fn send_items(
 
 pub(crate) fn send_grab_answer(
     mut server: ResMut<RenetServer>,
-    mut grab_ansewer: EventReader<GrabAnsEv>,
+    mut grab_ansewer: EventReader<GrabAnsEvent>,
 ) {
     for event in grab_ansewer.read() {
         let Ok(sync_message) = bincode::serialize(&ServerMessages::GrabAnswer(
@@ -64,9 +65,10 @@ pub(crate) fn send_grab_answer(
     }
 }
 
+
 pub(crate) fn send_throw_answer(
     mut server: ResMut<RenetServer>,
-    mut throw_answer: EventReader<ThrowAnswerEv>,
+    mut throw_answer: EventReader<ThrowAnswerEvent>,
 ) {
     for event in throw_answer.read() {
         let Ok(throw_msg) = bincode::serialize(&ServerMessages::ThrowAnswer {
@@ -79,3 +81,4 @@ pub(crate) fn send_throw_answer(
         server.broadcast_message(DefaultChannel::Unreliable, throw_msg);
     }
 }
+

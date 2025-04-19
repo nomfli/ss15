@@ -1,4 +1,3 @@
-
 use crate::server::{
     logic::hands::{GrabEvent, ThrowEvent},
     network::{connection::*, sending::SendItems},
@@ -59,9 +58,8 @@ pub(crate) fn message_handler(
     mut commands: Commands,
     lobby: Res<Lobby>,
     mut server: ResMut<RenetServer>,
-    mut grap_ev: EventWriter<GrabEvent>,
+    mut grab_ev: EventWriter<GrabEvent>,
     mut throw_ev: EventWriter<ThrowEvent>,
-
 ) {
     for client_id in server.clients_id() {
         while let Some(message) = server.receive_message(client_id, DefaultChannel::Unreliable) {
@@ -88,11 +86,12 @@ pub(crate) fn message_handler(
                     can_be_grabbed,
                     hand_idx,
                 }) => {
-                    let Some(i_want_grabb) = lobby.players.get(&client_id) else {
+
+                    let Some(i_want_grab) = lobby.players.get(&client_id) else {
                         continue;
                     };
-                    grap_ev.send(GrabEvent {
-                        i_want_grabb: *i_want_grabb,
+                    grab_ev.send(GrabEvent {
+                        i_want_grab: *i_want_grab,
                         can_be_grabbed,
                         hand_idx,
                         client: client_id,
@@ -112,6 +111,7 @@ pub(crate) fn message_handler(
                         where_throw,
                     });
                 }
+
 
                 Err(_) => {}
             }

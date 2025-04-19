@@ -1,12 +1,13 @@
 use crate::client::render::{
-    connection::PlayerConnected, hands::ShouldGrabb, movement::ChangePositions,
+
+    connection::PlayerConnected, hands::ShouldGrab, movement::ChangePositions,
+
 };
 use crate::shared::{
     components::Grabbable,
     events::ThrowAnswerEv,
     messages::ServerMessages,
     resource::{Entities, Lobby},
-
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -30,8 +31,9 @@ pub(crate) fn receive_message(
     (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut throw_ev): (
         EventWriter<ChangePositions>,
         EventWriter<PlayerConnected>,
-        EventWriter<ShouldGrabb>,
+        EventWriter<ShouldGrab>,
         EventWriter<ThrowAnswerEv>,
+
     ),
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
@@ -75,7 +77,8 @@ pub(crate) fn receive_message(
                 ents.entities.insert(client_ent_id, ent);
             }
             Ok(ServerMessages::GrabAnswer(ent, id)) => {
-                grab_event.send(ShouldGrabb {
+
+                grab_event.send(ShouldGrab {
                     i_must_be_grabbed: ent,
                     who_should_grabe: id,
                 });
@@ -90,6 +93,7 @@ pub(crate) fn receive_message(
                     hand_idx,
                     where_throw,
                 });
+
 
             }
             _ => {}

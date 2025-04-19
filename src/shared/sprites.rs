@@ -27,7 +27,6 @@ pub fn init_sprites(mut sprites: ResMut<Sprites>, asset_server: Res<AssetServer>
             ..Default::default()
         },
     );
-
     let adrenalin = "adrenalin".to_string();
 
     sprites.0.insert(
