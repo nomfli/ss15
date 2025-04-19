@@ -32,6 +32,7 @@ pub(crate) struct GrabAnsEvent {
     pub client: ClientId,
 }
 
+
 pub fn grab_answer_handler(
     mut grab_ev: EventReader<GrabEvent>,
     mut i_want_grab: Query<(&Transform, &mut Hands)>,
@@ -41,11 +42,14 @@ pub fn grab_answer_handler(
 ) {
     for event in grab_ev.read() {
         if let Ok((trans, mut hands)) = i_want_grab.get_mut(event.i_want_grab) {
+
             if let Ok((pos, grabbable)) = can_be_grabbed.get(event.can_be_grabbed) {
                 if !grabbable.0 {
                     continue;
                 }
+
                 if hands.all_hands[event.hand_idx].grab_ent.is_none()
+
                     && (trans.translation.truncate() - pos.translation.truncate()).length()
                         < hands.all_hands[event.hand_idx].hand_len
                 {
@@ -65,6 +69,7 @@ pub fn grab_answer_handler(
         }
     }
 }
+
 
 #[derive(Event, Debug)]
 pub(crate) struct ThrowEvent {
@@ -107,3 +112,4 @@ pub(crate) fn throw_answer(
         }
     }
 }
+

@@ -10,8 +10,6 @@ impl Plugin for InputClientPlug {
         app.add_systems(Update, mouse_coords_to_world);
         app.add_systems(Update, mouse_coords_to_world);
         app.init_resource::<Mouse>();
-
-
     }
 }
 
@@ -28,7 +26,6 @@ pub(crate) fn movement_input(
     player_input.down =
         keyboard_input.pressed(KeyCode::KeyS) || keyboard_input.pressed(KeyCode::ArrowDown);
 }
-
 
 #[derive(Clone, Copy, Default, Debug, Resource)]
 pub struct Mouse {

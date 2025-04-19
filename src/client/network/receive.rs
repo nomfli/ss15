@@ -1,5 +1,7 @@
 use crate::client::render::{
-    connection::PlayerConnected, hands::ShouldGrab, movement::ChangePositions,
+    connection::PlayerConnected,
+    hands::ShouldGrab,
+    movement::{ChangePositions, SpeedEvent},
 };
 use crate::shared::{
     components::Grabbable,
@@ -19,18 +21,21 @@ impl Plugin for ClientNetworkPlug {
     }
 }
 
+type ReceiveEvents<'a> = (
+    EventWriter<'a, ChangePositions>,
+    EventWriter<'a, PlayerConnected>,
+    EventWriter<'a, ShouldGrab>,
+    EventWriter<'a, SpeedEvent>,
+    EventWriter<'a, ThrowAnswerEvent>,
+);
+
 pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
-    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut throw_event): (
-        EventWriter<ChangePositions>,
-        EventWriter<PlayerConnected>,
-        EventWriter<ShouldGrab>,
-        EventWriter<ThrowAnswerEvent>,
-    ),
+    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut speed_event, mut throw_event): ReceiveEvents,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -87,6 +92,9 @@ pub(crate) fn receive_message(
                     hand_idx,
                     where_throw,
                 });
+            }
+            Ok(ServerMessages::Speed(speed)) => {
+                speed_event.send(SpeedEvent(speed));
             }
             _ => {}
         }

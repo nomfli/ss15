@@ -1,7 +1,6 @@
 use crate::server::logic::movement::*;
-
 use crate::shared::{
-    components::{Hand, Hands, Player},
+    components::{Hand, Hands, Player, Speed},
     messages::ServerMessages,
     resource::Lobby,
 };
@@ -75,7 +74,6 @@ pub(crate) fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> E
         .insert(Hands {
             all_hands: vec![
                 Hand {
-
                     grab_ent: None,
                     hand_len: 100000.0,
                 },
