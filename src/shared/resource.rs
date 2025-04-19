@@ -11,7 +11,6 @@ impl Plugin for ResInitPlug {
     fn build(&self, app: &mut App) {
         app.init_resource::<Lobby>();
         app.init_resource::<MovementInput>();
-
         app.insert_resource(Entities {
             entities: Bimap::new(),
         });
@@ -31,7 +30,6 @@ pub struct MovementInput {
     pub left: bool,
     pub right: bool,
 }
-
 
 #[derive(Debug, Default)]
 pub struct Bimap<T, V> {
