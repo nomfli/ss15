@@ -42,7 +42,6 @@ pub struct TryToGrabEvent {
     pub hand_idx: usize,
 }
 
-
 pub fn try_to_grab(
     i_want_grab: Query<(&Hands, &PlayerEntity)>,
     can_be_grabed: Query<(&Transform, &Sprite, Entity, &Grabbable)>,
@@ -84,7 +83,6 @@ pub fn try_to_grab(
     }
 }
 
-
 #[derive(Event, Debug)]
 pub struct ShouldGrab {
     pub i_must_be_grabbed: Entity,
@@ -99,7 +97,6 @@ pub fn grab_event_handler(
 ) {
     for event in grab_event.read() {
         let Some(&player_entity) = lobby.players.get(&event.who_should_grab) else {
-
             continue;
         };
         let Ok(mut hands) = query.get_mut(player_entity) else {
@@ -114,8 +111,7 @@ pub fn grab_event_handler(
         }
 
         let selected_idx = hands.selected_hand;
-        hands.all_hands[selected_idx].grabb_ent = Some(must_be_grabbed);
-
+        hands.all_hands[selected_idx].grab_ent = Some(must_be_grabbed);
 
         commands
             .entity(must_be_grabbed)
@@ -123,7 +119,6 @@ pub fn grab_event_handler(
             .remove::<Transform>();
     }
 }
-
 
 #[derive(Event)]
 pub(crate) struct SendTryThrow {
@@ -188,4 +183,3 @@ pub(crate) fn throw(
         }
     }
 }
-
