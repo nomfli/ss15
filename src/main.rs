@@ -8,12 +8,12 @@ use crate::{
     client::{
         network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
         render::{
-            connection::ConnectionPlug, init::InitRenderPlug, input::InputClientPlug,
-            movement::MovementClientPlug,
+            chat::ChatClientPlug, connection::ConnectionPlug, init::InitRenderPlug,
+            input::InputClientPlug, movement::MovementClientPlug,
         },
     },
     server::{
-        logic::{init::ServerInitPlug, movement::MovementServerPlug},
+        logic::{chat::ChatServerPlug, init::ServerInitPlug, movement::MovementServerPlug},
         network::{
             connection::ConnectionHandlerPlug, init::StartupServerPlug, sending::ServerSendPlug,
             update_server_system::UpdateServerPlug,
@@ -21,13 +21,13 @@ use crate::{
     },
 };
 
-use crate::shared::{resource::ResInitPlug, sprites::SpritesPlug};
+use crate::shared::{chat::ChatSharedPlug, resource::ResInitPlug, sprites::SpritesPlug};
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let exec_type = args[1].as_str();
     let mut app = App::new();
-    app.add_plugins((DefaultPlugins, ResInitPlug, SpritesPlug));
+    app.add_plugins((DefaultPlugins, ResInitPlug, SpritesPlug, ChatSharedPlug));
 
     match exec_type {
         "server" => {
@@ -38,6 +38,7 @@ fn main() {
                 StartupServerPlug,
                 ServerSendPlug,
                 UpdateServerPlug,
+                ChatServerPlug,
             ));
         }
 
@@ -50,6 +51,7 @@ fn main() {
                 InitRenderPlug,
                 InputClientPlug,
                 MovementClientPlug,
+                ChatClientPlug,
             ));
         }
 

@@ -2,6 +2,20 @@ use crate::shared::chat::ChatMode;
 use bevy::input::keyboard::*;
 use bevy::prelude::*;
 
+pub(crate) struct ChatClientPlug;
+
+impl Plugin for ChatClientPlug {
+    fn build(&self, app: &mut App) {
+        app.init_resource::<ChatOpened>();
+        app.init_resource::<MessageText>();
+        app.add_systems(Update, open_chat);
+        app.add_systems(Update, open_chat);
+        app.add_systems(Update, change_chat_mode);
+        app.add_systems(Update, make_chat_message);
+        app.add_event::<SendChatMsg>();
+    }
+}
+
 #[derive(Default, Debug, Resource, Clone, Copy)]
 pub(crate) struct ChatOpened(pub bool);
 

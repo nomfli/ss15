@@ -7,7 +7,16 @@ use crate::{
 };
 use bevy::prelude::*;
 
-pub const SAY_RADIUS: f32 = 5000.0;
+pub(crate) const SAY_RADIUS: f32 = 5000.0;
+
+pub(crate) struct ChatServerPlug;
+
+impl Plugin for ChatServerPlug {
+    fn build(&self, app: &mut App) {
+        app.add_event::<MsgHandlerEvent>();
+        app.add_systems(Update, handle_chat_msg);
+    }
+}
 
 #[derive(Event, Debug, Clone)]
 pub(crate) struct MsgHandlerEvent {
@@ -24,7 +33,6 @@ pub(crate) fn handle_chat_msg(
     positions: Res<Positions>,
 ) {
     for event in handle_msg_ev.read() {
-        let transform = query.get(event.client_ent);
         match event.mode {
             ChatMode::Say => {
                 let Ok(transform) = query.get(event.client_ent) else {
@@ -33,6 +41,7 @@ pub(crate) fn handle_chat_msg(
                 let center = transform.translation.truncate();
                 let radius = SAY_RADIUS;
                 (*event).entities_in_radius(&Circle { center, radius }, &positions);
+                //TODO
             }
             _ => {} //TODO
         }

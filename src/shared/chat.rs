@@ -1,6 +1,14 @@
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
+pub(crate) struct ChatSharedPlug;
+
+impl Plugin for ChatSharedPlug {
+    fn build(&self, app: &mut App) {
+        app.init_resource::<ChatMode>();
+    }
+}
+
 #[derive(Default, Debug, Resource, Clone, Copy, Serialize, Deserialize)]
 pub(crate) enum ChatMode {
     #[default]
