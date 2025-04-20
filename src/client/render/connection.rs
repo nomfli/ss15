@@ -1,8 +1,6 @@
 use crate::shared::{
-
     components::{Hand, Hands, PlayerEntity},
     resource::{Entities, Lobby},
-
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -12,7 +10,7 @@ pub struct ConnectionPlug;
 
 impl Plugin for ConnectionPlug {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, player_connected);
+        app.add_systems(PreUpdate, player_connected);
         app.add_event::<PlayerConnected>();
     }
 }
@@ -42,7 +40,6 @@ pub(crate) fn player_connected(
         }
         lobby.players.insert(client_id, player_entity_id);
         ents.entities.insert(player_entity_id, event.ent_id);
-
     }
 }
 
@@ -54,19 +51,17 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
             .insert(Hands {
                 all_hands: vec![
                     Hand {
-                        grabb_ent: None,
+                        grab_ent: None,
                         hand_len: 100000.0,
                     },
                     Hand {
-                        grabb_ent: None,
+                        grab_ent: None,
                         hand_len: 100000.0,
                     },
                 ],
                 selected_hand: 0,
             })
-
             .id();
-
         player_entity_id
     } else {
         panic!("Missing sprite 'red_sqr' for entity ID {:?}", ent_id);

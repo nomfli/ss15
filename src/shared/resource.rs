@@ -11,7 +11,6 @@ impl Plugin for ResInitPlug {
     fn build(&self, app: &mut App) {
         app.init_resource::<Lobby>();
         app.init_resource::<MovementInput>();
-
         app.insert_resource(Entities {
             entities: Bimap::new(),
         });

@@ -7,11 +7,9 @@ pub struct InputClientPlug;
 impl Plugin for InputClientPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, movement_input);
-
         app.add_systems(Update, mouse_coords_to_world);
         app.add_systems(Update, mouse_coords_to_world);
         app.init_resource::<Mouse>();
-
     }
 }
 

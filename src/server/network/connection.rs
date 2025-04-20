@@ -74,17 +74,16 @@ pub(crate) fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> E
         .insert(Hands {
             all_hands: vec![
                 Hand {
-                    grabb_ent: None,
+                    grab_ent: None,
                     hand_len: 100000.0,
                 },
                 Hand {
-                    grabb_ent: None,
+                    grab_ent: None,
                     hand_len: 100000.0,
                 },
             ],
             selected_hand: 0,
         })
-
         .insert(Acceleration(ACCELERATION))
         .insert(MaxSpeed(MAX_MOVE_SPEED))
         .insert(Speed { x: 0.0, y: 0.0 })

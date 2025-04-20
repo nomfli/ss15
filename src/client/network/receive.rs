@@ -1,12 +1,13 @@
 
 use crate::client::render::{
-    connection::PlayerConnected, hands::ShouldGrabb, movement::ChangePositions,
+    connection::PlayerConnected, hands::ShouldGrab, movement::ChangePositions,
+
 };
 use crate::shared::{
     components::Grabbable,
+    events::ThrowAnswerEvent,
     messages::ServerMessages,
     resource::{Entities, Lobby},
-
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -24,15 +25,14 @@ pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
-
     mut positions: ResMut<ChangePositions>,
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
-    (mut user_connected_ev, mut grab_event): (
+    (mut user_connected_ev, mut grab_event, mut throw_event): (
         EventWriter<PlayerConnected>,
-        EventWriter<ShouldGrabb>,
+        EventWriter<ShouldGrab>,
+        EventWriter<ThrowAnswerEvent>,
     ),
-
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -70,13 +70,11 @@ pub(crate) fn receive_message(
             Ok(ServerMessages::AddItem(item)) => {
                 //need to
                 //incapsulate
-
                 let ([x, y], name, ent, grabbable) = item;
                 let Some(sprite) = sprites.0.get(&name.0) else {
                     continue;
                 };
                 let client_ent_id = commands
-
                     .spawn(Transform {
                         translation: Vec3::new(x, y, 0.0),
                         ..Default::default()
@@ -88,11 +86,21 @@ pub(crate) fn receive_message(
                 ents.entities.insert(client_ent_id, ent);
             }
             Ok(ServerMessages::GrabAnswer(ent, id)) => {
-                grab_event.send(ShouldGrabb {
+                grab_event.send(ShouldGrab {
                     i_must_be_grabbed: ent,
-                    who_should_grabe: id,
+                    who_should_grab: id,
                 });
-
+            }
+            Ok(ServerMessages::ThrowAnswer {
+                client_id,
+                hand_idx,
+                where_throw,
+            }) => {
+                throw_event.send(ThrowAnswerEvent {
+                    client: client_id,
+                    hand_idx,
+                    where_throw,
+                });
             }
             _ => {}
         }

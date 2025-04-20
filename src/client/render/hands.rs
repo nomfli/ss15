@@ -2,7 +2,9 @@ use crate::{
     client::render::input::Mouse,
     shared::{
         components::{Grabbable, Hands, PlayerEntity},
+        events::ThrowAnswerEvent,
         resource::{Entities, Lobby},
+        sprites::{SpriteName, Sprites},
     },
 };
 use bevy::prelude::*;
@@ -12,11 +14,14 @@ pub struct HandsClientPlug;
 
 impl Plugin for HandsClientPlug {
     fn build(&self, app: &mut App) {
-        app.add_event::<ShouldGrabb>();
-        app.add_event::<TryToGrabbEvent>();
+        app.add_event::<ShouldGrab>();
+        app.add_event::<TryToGrabEvent>();
+        app.add_event::<SendTryThrow>();
+        app.add_systems(Update, throw);
         app.add_systems(Update, change_hand);
-        app.add_systems(Update, try_to_grabb);
+        app.add_systems(Update, try_to_grab);
         app.add_systems(Update, grab_event_handler);
+        app.add_systems(Update, try_throw);
     }
 }
 
@@ -32,27 +37,29 @@ pub fn change_hand(
 }
 
 #[derive(Event)]
-pub struct TryToGrabbEvent {
+pub struct TryToGrabEvent {
     pub can_be_grabbed: Entity, //server Entity
     pub hand_idx: usize,
 }
 
-pub fn try_to_grabb(
-    i_want_grabb: Query<(&Hands, &PlayerEntity)>,
-    can_be_grabbed: Query<(&Transform, &Sprite, Entity, &Grabbable)>,
+
+pub fn try_to_grab(
+    i_want_grab: Query<(&Hands, &PlayerEntity)>,
+    can_be_grabed: Query<(&Transform, &Sprite, Entity, &Grabbable)>,
     entities: Res<Entities>,
     mouse_input: Res<Mouse>,
-    mut writer: EventWriter<TryToGrabbEvent>,
+    mut writer: EventWriter<TryToGrabEvent>,
 ) {
-    for (hands, _) in i_want_grabb.iter() {
+    for (hands, _) in i_want_grab.iter() {
         let selected_idx = hands.selected_hand;
-        if hands.all_hands[selected_idx].grabb_ent.is_some() {
+        if hands.all_hands[selected_idx].grab_ent.is_some() {
             return;
         }
         let Some(cur_pos) = mouse_input.cords else {
             return;
         };
-        for (coords, sprite, ent, grabbable) in can_be_grabbed.iter() {
+
+        for (coords, sprite, ent, grabbable) in can_be_grabed.iter() {
             if !grabbable.0 {
                 continue;
             }
@@ -68,7 +75,7 @@ pub fn try_to_grabb(
                 let Some(server_ent) = entities.entities.get_by_first(&ent) else {
                     panic!("problem with bimap entities can't find entity");
                 };
-                writer.send(TryToGrabbEvent {
+                writer.send(TryToGrabEvent {
                     can_be_grabbed: *server_ent,
                     hand_idx: selected_idx,
                 });
@@ -76,20 +83,23 @@ pub fn try_to_grabb(
         }
     }
 }
+
+
 #[derive(Event, Debug)]
-pub struct ShouldGrabb {
+pub struct ShouldGrab {
     pub i_must_be_grabbed: Entity,
-    pub who_should_grabe: ClientId,
+    pub who_should_grab: ClientId,
 }
 pub fn grab_event_handler(
     lobby: Res<Lobby>,
     entities: Res<Entities>,
-    mut grab_event: EventReader<ShouldGrabb>,
+    mut grab_event: EventReader<ShouldGrab>,
     mut query: Query<&mut Hands>,
     mut commands: Commands,
 ) {
     for event in grab_event.read() {
-        let Some(&player_entity) = lobby.players.get(&event.who_should_grabe) else {
+        let Some(&player_entity) = lobby.players.get(&event.who_should_grab) else {
+
             continue;
         };
         let Ok(mut hands) = query.get_mut(player_entity) else {
@@ -106,9 +116,76 @@ pub fn grab_event_handler(
         let selected_idx = hands.selected_hand;
         hands.all_hands[selected_idx].grabb_ent = Some(must_be_grabbed);
 
+
         commands
             .entity(must_be_grabbed)
             .remove::<Sprite>()
             .remove::<Transform>();
     }
 }
+
+
+#[derive(Event)]
+pub(crate) struct SendTryThrow {
+    pub hand_idx: usize,
+    pub where_throw: Vec2,
+}
+
+pub(crate) fn try_throw(
+    keyboard: Res<ButtonInput<KeyCode>>,
+    query: Query<(&PlayerEntity, &Hands)>,
+    mut send_ev: EventWriter<SendTryThrow>,
+    mouse_input: Res<Mouse>,
+) {
+    for (_, hands) in query.iter() {
+        let hand_idx = hands.selected_hand;
+        if hands.all_hands[hand_idx].grab_ent.is_none() {
+            return;
+        }
+        let Some(where_throw) = mouse_input.cords else {
+            return;
+        };
+        if keyboard.pressed(KeyCode::KeyQ) {
+            send_ev.send(SendTryThrow {
+                hand_idx,
+                where_throw,
+            });
+        }
+    }
+}
+
+pub(crate) fn throw(
+    mut reader: EventReader<ThrowAnswerEvent>,
+    mut commands: Commands,
+    mut hands_query: Query<&mut Hands>,
+    sprite_query: Query<&SpriteName>,
+    lobby: Res<Lobby>,
+    sprites: Res<Sprites>,
+) {
+    for event in reader.read() {
+        let Some(ent) = lobby.players.get(&event.client) else {
+            continue;
+        };
+        let Ok(mut hands) = hands_query.get_mut(*ent) else {
+            continue;
+        };
+        let Some(i_want_freedom) = hands.all_hands[event.hand_idx].grab_ent else {
+            continue;
+        };
+        let [x, y] = event.where_throw;
+
+        if let Ok(sprite_name) = sprite_query.get(i_want_freedom) {
+            if let Some(sprite) = sprites.0.get(&sprite_name.0) {
+                commands
+                    .entity(i_want_freedom)
+                    .insert(Transform {
+                        translation: Vec3::new(x, y, 0.0),
+                        ..Default::default()
+                    })
+                    .insert(sprite.clone());
+                hands.all_hands[event.hand_idx].grab_ent = None;
+            }
+        }
+    }
+}
+

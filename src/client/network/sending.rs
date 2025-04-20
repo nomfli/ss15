@@ -1,6 +1,6 @@
 
 use crate::{
-    client::render::hands::TryToGrabbEvent,
+    client::render::hands::{SendTryThrow, TryToGrabEvent},
     shared::{messages::ClientMessages, resource::MovementInput},
 };
 
@@ -12,9 +12,8 @@ pub(crate) struct ClientSendingPlug;
 impl Plugin for ClientSendingPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, client_send_movement);
-
         app.add_systems(Update, send_grabbing);
-
+        app.add_systems(Update, send_try_throw);
     }
 }
 
@@ -33,15 +32,30 @@ pub(crate) fn client_send_movement(
 }
 
 pub(crate) fn send_grabbing(
-    mut reader: EventReader<TryToGrabbEvent>,
+    mut reader: EventReader<TryToGrabEvent>,
     mut client: ResMut<RenetClient>,
 ) {
     for event in reader.read() {
-        if let Ok(grabb_msg) = bincode::serialize(&ClientMessages::Grab {
+        if let Ok(grab_msg) = bincode::serialize(&ClientMessages::Grab {
             can_be_grabbed: event.can_be_grabbed,
             hand_idx: event.hand_idx,
         }) {
-            client.send_message(DefaultChannel::Unreliable, grabb_msg);
+            client.send_message(DefaultChannel::Unreliable, grab_msg);
         }
+    }
+}
+
+pub(crate) fn send_try_throw(
+    mut ev_reader: EventReader<SendTryThrow>,
+    mut client: ResMut<RenetClient>,
+) {
+    for event in ev_reader.read() {
+        let Ok(throw_msg) = bincode::serialize(&ClientMessages::Throw {
+            selected_idx: event.hand_idx,
+            where_throw: event.where_throw,
+        }) else {
+            continue;
+        };
+        client.send_message(DefaultChannel::Unreliable, throw_msg);
     }
 }
