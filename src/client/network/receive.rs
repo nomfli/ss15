@@ -1,7 +1,5 @@
-
 use crate::client::render::{
     connection::PlayerConnected, hands::ShouldGrab, movement::ChangePositions,
-
 };
 use crate::shared::{
     components::Grabbable,
@@ -52,7 +50,6 @@ pub(crate) fn receive_message(
     while let Some(message) = client.receive_message(DefaultChannel::Unreliable) {
         match bincode::deserialize(&message) {
             Ok(ServerMessages::SendPositions(players)) => {
-
                 let updates: Vec<_> = players
                     .iter()
                     .filter_map(|(ent, cords)| {
@@ -64,7 +61,6 @@ pub(crate) fn receive_message(
                 for (client_ent, cords) in updates {
                     positions.0.insert(client_ent, cords);
                 }
-
             }
 
             Ok(ServerMessages::AddItem(item)) => {
