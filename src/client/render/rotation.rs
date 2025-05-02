@@ -95,14 +95,3 @@ pub(crate) fn render_rotation(mut query: Query<(&Direction, &mut Sprite)>) {
         }
     }
 }
-
-impl From<Direction> for usize {
-    fn from(dir: Direction) -> usize {
-        match dir {
-            Direction::Up => 0usize,
-            Direction::Down => 1usize,
-            Direction::Right => 2usize,
-            Direction::Left => 3usize,
-        }
-    }
-}
