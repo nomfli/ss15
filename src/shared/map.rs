@@ -21,7 +21,9 @@ type Entities = Vec<Entity>;
 pub(crate) struct Map {
     pub floor: Floor,
     pub wall: Wall,
+    #[allow(dead_code)]
     pub stationary_objects: StationaryObjects,
+    #[allow(dead_code)]
     pub entities: Entities,
 }
 
