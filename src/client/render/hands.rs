@@ -139,7 +139,7 @@ pub(crate) fn try_throw(
             return;
         };
         if keyboard.pressed(KeyCode::KeyQ) {
-            send_ev.send(SendTryThrow {
+            send_ev.write(SendTryThrow {
                 hand_idx,
                 where_throw,
             });

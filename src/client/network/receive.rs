@@ -82,7 +82,7 @@ pub(crate) fn receive_message(
                 hand_idx,
                 where_throw,
             }) => {
-                throw_event.send(ThrowAnswerEvent {
+                throw_event.write(ThrowAnswerEvent {
                     client: client_id,
                     hand_idx,
                     where_throw,

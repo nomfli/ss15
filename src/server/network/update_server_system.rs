@@ -86,7 +86,6 @@ pub(crate) fn message_handler(
                     can_be_grabbed,
                     hand_idx,
                 }) => {
-
                     let Some(i_want_grab) = lobby.players.get(&client_id) else {
                         continue;
                     };
@@ -104,14 +103,13 @@ pub(crate) fn message_handler(
                     let Some(i_want_throw) = lobby.players.get(&client_id) else {
                         continue;
                     };
-                    throw_ev.send(ThrowEvent {
+                    throw_ev.write(ThrowEvent {
                         client: client_id,
                         selected_idx,
                         i_want_throw: *i_want_throw,
                         where_throw,
                     });
                 }
-
 
                 Err(_) => {}
             }

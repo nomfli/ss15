@@ -99,7 +99,7 @@ pub(crate) fn throw_answer(
                 translation: Vec3::new(x, y, 0.0),
                 ..Default::default()
             });
-            answer.send(ThrowAnswerEvent {
+            answer.write(ThrowAnswerEvent {
                 hand_idx: event.selected_idx,
                 client: event.client,
                 where_throw: [x, y],
