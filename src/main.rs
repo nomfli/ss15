@@ -9,7 +9,8 @@ use crate::{
         network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
         render::{
             connection::ConnectionPlug, hands::HandsClientPlug, init::InitRenderPlug,
-            input::InputClientPlug, movement::MovementClientPlug, rotation::RotClientPlug,
+            input::InputClientPlug, map::ClientMapPlug, movement::MovementClientPlug, rotation::RotClientPlug
+
         },
     },
     server::{
@@ -24,13 +25,22 @@ use crate::{
     },
 };
 
-use crate::shared::{events::SharedEvents, resource::ResInitPlug, sprites::SpritesPlug};
+use crate::shared::{
+    events::SharedEvents, map::SharedMapPlug, resource::ResInitPlug, sprites::SpritesPlug,
+};
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let exec_type = args[1].as_str();
     let mut app = App::new();
-    app.add_plugins((DefaultPlugins, ResInitPlug, SpritesPlug, SharedEvents));
+
+  app.add_plugins((
+        DefaultPlugins,
+        ResInitPlug,
+        SpritesPlug,
+        SharedEvents,
+        SharedMapPlug,
+    ));
     match exec_type {
         "server" => {
             app.add_plugins((
@@ -54,6 +64,7 @@ fn main() {
                 InputClientPlug,
                 MovementClientPlug,
                 HandsClientPlug,
+                ClientMapPlug,
                 RotClientPlug,
             ));
         }
