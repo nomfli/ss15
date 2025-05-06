@@ -23,14 +23,13 @@ pub(crate) fn render_map(
             translation: Vec3::new(x as f32, y as f32, 0.0),
             ..Default::default()
         });
-
-        query
+        if let Some(sprite) = query
             .get(ent)
             .ok()
             .and_then(|sprite_name| sprites.0.get(&sprite_name.0))
-            .map(|sprite| {
-                commands.entity(ent).insert(sprite.clone());
-            });
+        {
+            commands.entity(ent).insert(sprite.clone());
+        }
     };
 
     map.floor
