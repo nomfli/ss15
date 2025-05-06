@@ -1,8 +1,4 @@
-use crate::shared::{
-    components::{PlayerEntity, Speed},
-    resource::Lobby,
-};
-
+use crate::shared::components::{PlayerEntity, Speed};
 
 use bevy::prelude::*;
 use std::collections::HashMap;
@@ -11,13 +7,12 @@ pub struct MovementClientPlug;
 
 impl Plugin for MovementClientPlug {
     fn build(&self, app: &mut App) {
-        app.add_event::<ChangePositions>();
+        app.init_resource::<ChangePositions>();
         app.add_event::<SpeedEvent>();
         app.add_systems(Update, change_position);
         app.add_systems(Update, change_speed);
     }
 }
-
 
 #[derive(Default, Debug, Clone, Resource)]
 pub(crate) struct ChangePositions(pub HashMap<Entity, [f32; 2]>);
@@ -31,10 +26,8 @@ pub(crate) fn change_position(change_pos: Res<ChangePositions>, mut commands: Co
             ..Default::default()
         };
         commands.entity(*ent).insert(transform);
-
     }
 }
-
 
 #[derive(Default, Debug, Clone, Event)]
 pub(crate) struct SpeedEvent(pub Speed);
@@ -50,4 +43,3 @@ pub(crate) fn change_speed(
         }
     }
 }
-

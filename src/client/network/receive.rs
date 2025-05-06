@@ -22,7 +22,6 @@ impl Plugin for ClientNetworkPlug {
 }
 
 type ReceiveEvents<'a> = (
-    EventWriter<'a, ChangePositions>,
     EventWriter<'a, PlayerConnected>,
     EventWriter<'a, ShouldGrab>,
     EventWriter<'a, SpeedEvent>,
@@ -36,7 +35,7 @@ pub(crate) fn receive_message(
     mut positions: ResMut<ChangePositions>,
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
-    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut speed_event, mut throw_event): ReceiveEvents,
+    (mut user_connected_ev, mut grab_event, mut speed_event, mut throw_event): ReceiveEvents,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();

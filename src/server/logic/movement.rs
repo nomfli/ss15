@@ -1,8 +1,4 @@
-use crate::shared::{
-    components::{Player, Speed},
-    messages::ServerMessages,
-    resource::MovementInput,
-};
+use crate::shared::{components::Speed, messages::ServerMessages, resource::MovementInput};
 
 use bevy::prelude::*;
 use bevy_renet::renet::*;
@@ -12,10 +8,8 @@ use std::{collections::HashMap, fmt::Debug};
 pub(crate) const MAX_MOVE_SPEED: f32 = 1000.0;
 pub(crate) const ACCELERATION: f32 = 100.0;
 
-
 #[derive(Resource, Debug, Default, Serialize, Deserialize)]
 pub(crate) struct Positions(pub HashMap<Entity, [f32; 2]>);
-
 
 #[derive(Component, Debug, Default, Serialize, Deserialize)]
 pub(crate) struct MaxSpeed(pub f32);
@@ -81,7 +75,6 @@ pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSp
     }
 }
 
-
 pub(crate) fn server_sync_players_movement(
     mut server: ResMut<RenetServer>,
     query: Query<(&Transform, Entity)>,
@@ -91,11 +84,9 @@ pub(crate) fn server_sync_players_movement(
         players
             .0
             .insert(ent, transform.translation.truncate().into());
-
     }
     if let Ok(sync_message) = bincode::serialize(&ServerMessages::SendPositions(players.0.clone()))
     {
         server.broadcast_message(DefaultChannel::Unreliable, sync_message);
     }
 }
-
