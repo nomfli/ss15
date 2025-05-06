@@ -108,7 +108,7 @@ pub fn grab_event_handler(
         else {
             continue;
         };
-        if !commands.get_entity(must_be_grabbed).is_ok() {
+        if commands.get_entity(must_be_grabbed).is_err() {
             continue;
         }
         let selected_idx = hands.selected_hand;
