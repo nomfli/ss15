@@ -42,6 +42,7 @@ pub struct TryToGrabEvent {
     pub hand_idx: usize,
 }
 
+
 pub fn try_to_grab(
     i_want_grab: Query<(&Hands, &PlayerEntity)>,
     can_be_grabed: Query<(&Transform, &Sprite, Entity, &Grabbable)>,
@@ -84,6 +85,7 @@ pub fn try_to_grab(
 }
 
 #[derive(Event, Debug)]
+
 pub struct ShouldGrab {
     pub i_must_be_grabbed: Entity,
     pub who_should_grab: ClientId,

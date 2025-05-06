@@ -22,13 +22,21 @@ pub fn init_sprites(
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    let red_sqr = "red_sqr".to_string();
+    let human = "human".to_string();
+    let texture: Handle<Image> = asset_server.load("./images/human.png");
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(64, 64), 2, 2, None, None);
+    let layout_handle = texture_atlas_layouts.add(layout);
     sprites.0.insert(
-        red_sqr,
+        human,
         Sprite {
+            image: texture,
+            texture_atlas: Some(TextureAtlas {
+                layout: layout_handle,
+                index: 2,
+            }),
             custom_size: Some(Vec2::new(32.0, 32.0)),
-            color: Color::srgb_u8(255, 0, 0),
-            ..Default::default()
+            ..default()
+
         },
     );
     let adrenalin = "adrenalin".to_string();

@@ -16,7 +16,6 @@ pub struct Player {
 #[derive(Clone, Copy, Default, Debug, Component, Serialize, Deserialize)]
 pub struct Grabbable(pub bool);
 
-
 #[derive(Default, Copy, Clone, Debug, Component, Serialize, Deserialize)]
 pub struct Hand {
     pub grab_ent: Option<Entity>,
@@ -27,4 +26,30 @@ pub struct Hand {
 pub struct Hands {
     pub all_hands: Vec<Hand>,
     pub selected_hand: usize,
+}
+
+#[derive(Component, Debug, Default, Serialize, Deserialize, Clone, Copy)]
+pub(crate) struct Speed {
+    pub x: f32,
+    pub y: f32,
+}
+
+#[derive(Component, Debug, Default, Serialize, Deserialize, Clone, Copy)]
+pub(crate) enum Direction {
+    #[default]
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+impl From<Direction> for usize {
+    fn from(dir: Direction) -> usize {
+        match dir {
+            Direction::Up => 0usize,
+            Direction::Down => 1usize,
+            Direction::Right => 2usize,
+            Direction::Left => 3usize,
+        }
+    }
 }
