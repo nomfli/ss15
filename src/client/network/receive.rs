@@ -83,7 +83,7 @@ pub(crate) fn receive_message(
                 });
             }
             Ok(ServerMessages::Speed(speed)) => {
-                speed_event.send(SpeedEvent(speed));
+                speed_event.write(SpeedEvent(speed));
             }
             Ok(ServerMessages::ThrowAnswer {
                 client_id,

@@ -1,5 +1,8 @@
 use crate::server::{
-    logic::{hands::{GrabEvent, ThrowEvent}, rotation::DirectionEvent},
+    logic::{
+        hands::{GrabEvent, ThrowEvent},
+        rotation::DirectionEvent,
+    },
     network::{connection::*, sending::SendItems},
 };
 
@@ -98,7 +101,7 @@ pub(crate) fn message_handler(
                     });
                 }
                 Ok(ClientMessages::Direction(dir)) => {
-                    dir_ev.send(DirectionEvent {
+                    dir_ev.write(DirectionEvent {
                         client: client_id,
                         direction: dir,
                     });
