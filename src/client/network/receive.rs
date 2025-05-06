@@ -96,9 +96,6 @@ pub(crate) fn receive_message(
                     where_throw,
                 });
             }
-            Ok(ServerMessages::Speed(speed)) => {
-                speed_event.send(SpeedEvent(speed));
-            }
             _ => {}
         }
     }
