@@ -1,4 +1,9 @@
-use crate::shared::{messages::ServerMessages, resource::MovementInput};
+use crate::shared::{
+    components::{Player, Speed},
+    messages::ServerMessages,
+    resource::MovementInput,
+};
+
 use bevy::prelude::*;
 use bevy_renet::renet::*;
 use serde::{Deserialize, Serialize};
@@ -7,11 +12,6 @@ use std::{collections::HashMap, fmt::Debug};
 pub(crate) const MAX_MOVE_SPEED: f32 = 1000.0;
 pub(crate) const ACCELERATION: f32 = 100.0;
 
-#[derive(Component, Debug, Default, Serialize, Deserialize)]
-pub(crate) struct Speed {
-    pub x: f32,
-    pub y: f32,
-}
 
 #[derive(Resource, Debug, Default, Serialize, Deserialize)]
 pub(crate) struct Positions(pub HashMap<Entity, [f32; 2]>);
