@@ -1,6 +1,6 @@
 use crate::shared::{
     components::Grabbable,
-    sprites::{SpriteName, Sprites},
+    sprites::{init_sprites, SpriteName, Sprites},
 };
 use bevy::prelude::*;
 
@@ -8,7 +8,7 @@ pub struct ServerInitPlug;
 
 impl Plugin for ServerInitPlug {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, init);
+        app.add_systems(Startup, init.after(init_sprites));
     }
 }
 
