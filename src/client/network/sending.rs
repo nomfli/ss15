@@ -30,6 +30,7 @@ pub(crate) fn client_send_movement(
     }
 }
 
+
 pub(crate) fn send_grabbing(
     mut reader: EventReader<TryToGrabEvent>,
     mut client: ResMut<RenetClient>,
@@ -43,6 +44,7 @@ pub(crate) fn send_grabbing(
         }
     }
 }
+
 
 pub(crate) fn send_try_throw(
     mut ev_reader: EventReader<SendTryThrow>,
