@@ -1,5 +1,5 @@
 use crate::server::{
-    logic::hands::{GrabEvent, ThrowEvent},
+    logic::{hands::{GrabEvent, ThrowEvent}, rotation::DirectionEvent},
     network::{connection::*, sending::SendItems},
 };
 
@@ -59,6 +59,7 @@ pub(crate) fn message_handler(
     lobby: Res<Lobby>,
     mut server: ResMut<RenetServer>,
     mut grab_ev: EventWriter<GrabEvent>,
+    mut dir_ev: EventWriter<DirectionEvent>,
     mut throw_ev: EventWriter<ThrowEvent>,
 ) {
     for client_id in server.clients_id() {
@@ -96,6 +97,12 @@ pub(crate) fn message_handler(
                         client: client_id,
                     });
                 }
+                Ok(ClientMessages::Direction(dir)) => {
+                    dir_ev.send(DirectionEvent {
+                        client: client_id,
+                        direction: dir,
+                    });
+                }
                 Ok(ClientMessages::Throw {
                     selected_idx,
                     where_throw,
@@ -110,7 +117,6 @@ pub(crate) fn message_handler(
                         where_throw,
                     });
                 }
-
                 Err(_) => {}
             }
         }
