@@ -34,7 +34,7 @@ pub(crate) fn receive_message(
         let server_message = bincode::deserialize(&message).unwrap();
         match server_message {
             ServerMessages::PlayerConnected { client_id, ent_id } => {
-                user_connected_ev.send(PlayerConnected { client_id, ent_id });
+                user_connected_ev.write(PlayerConnected { client_id, ent_id });
             }
 
             ServerMessages::PlayerDisconnected { id } => {
@@ -48,7 +48,7 @@ pub(crate) fn receive_message(
     while let Some(message) = client.receive_message(DefaultChannel::Unreliable) {
         match bincode::deserialize(&message) {
             Ok(ServerMessages::SendPositions(players)) => {
-                change_pos_ev.send(ChangePositions(players));
+                change_pos_ev.write(ChangePositions(players));
             }
 
             Ok(ServerMessages::AddItem(item)) => {
@@ -70,7 +70,7 @@ pub(crate) fn receive_message(
                 ents.entities.insert(client_ent_id, ent);
             }
             Ok(ServerMessages::GrabAnswer(ent, id)) => {
-                grab_event.send(ShouldGrab {
+                grab_event.write(ShouldGrab {
                     i_must_be_grabbed: ent,
                     who_should_grab: id,
                 });

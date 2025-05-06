@@ -44,7 +44,7 @@ pub fn grab_answer_handler(
                         < hands.all_hands[event.hand_idx].hand_len
                 {
                     {
-                        send_grab_ev.send(GrabAnsEvent {
+                        send_grab_ev.write(GrabAnsEvent {
                             can_be_grabbed: event.can_be_grabbed,
                             client: event.client,
                         });

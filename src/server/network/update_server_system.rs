@@ -30,10 +30,10 @@ pub(crate) fn connections_handler(
     for event in server_events.read() {
         match event {
             ServerEvent::ClientConnected { client_id } => {
-                client_connected.send(SendPlayerConnection {
+                client_connected.write(SendPlayerConnection {
                     client_id: *client_id,
                 });
-                send_items.send(SendItems {
+                send_items.write(SendItems {
                     client_id: *client_id,
                 });
             }
@@ -88,7 +88,7 @@ pub(crate) fn message_handler(
                     let Some(i_want_grab) = lobby.players.get(&client_id) else {
                         continue;
                     };
-                    grab_ev.send(GrabEvent {
+                    grab_ev.write(GrabEvent {
                         i_want_grab: *i_want_grab,
                         can_be_grabbed,
                         hand_idx,
