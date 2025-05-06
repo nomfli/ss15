@@ -82,6 +82,9 @@ pub(crate) fn receive_message(
                     who_should_grab: id,
                 });
             }
+            Ok(ServerMessages::Speed(speed)) => {
+                speed_event.send(SpeedEvent(speed));
+            }
             Ok(ServerMessages::ThrowAnswer {
                 client_id,
                 hand_idx,

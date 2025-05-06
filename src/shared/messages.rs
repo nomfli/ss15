@@ -1,4 +1,3 @@
-
 use crate::shared::{
     components::{Direction, Grabbable, Speed},
     sprites::SpriteName,
@@ -28,6 +27,7 @@ pub enum ServerMessages {
         hand_idx: usize,
         where_throw: [f32; 2],
     },
+
 }
 
 #[derive(Debug, Serialize, Deserialize, Component)]

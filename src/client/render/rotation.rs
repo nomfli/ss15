@@ -91,12 +91,7 @@ pub(crate) fn add_rotation(
 pub(crate) fn render_rotation(mut query: Query<(&Direction, &mut Sprite)>) {
     for (direction, mut sprite) in query.iter_mut() {
         if let Some(ref mut atlas) = sprite.texture_atlas {
-            atlas.index = match direction {
-                Direction::Up => 0,
-                Direction::Down => 1,
-                Direction::Right => 2,
-                Direction::Left => 3,
-            };
+            atlas.index = usize::from(*direction);
         }
     }
 }

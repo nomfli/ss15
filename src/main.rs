@@ -9,11 +9,14 @@ use crate::{
         network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
         render::{
             connection::ConnectionPlug, hands::HandsClientPlug, init::InitRenderPlug,
-            input::InputClientPlug, movement::MovementClientPlug, rotation::RotClientPlug
+            input::InputClientPlug, movement::MovementClientPlug, rotation::RotClientPlug,
         },
     },
     server::{
-        logic::{hands::HandsServerPlug, init::ServerInitPlug, movement::MovementServerPlug, rotation::RotServerPlug}, 
+        logic::{
+            hands::HandsServerPlug, init::ServerInitPlug, movement::MovementServerPlug,
+            rotation::RotServerPlug,
+        },
         network::{
             connection::ConnectionHandlerPlug, init::StartupServerPlug, sending::ServerSendPlug,
             update_server_system::UpdateServerPlug,
@@ -28,7 +31,6 @@ fn main() {
     let exec_type = args[1].as_str();
     let mut app = App::new();
     app.add_plugins((DefaultPlugins, ResInitPlug, SpritesPlug, SharedEvents));
-
     match exec_type {
         "server" => {
             app.add_plugins((
@@ -42,7 +44,6 @@ fn main() {
                 RotServerPlug,
             ));
         }
-
         "client" => {
             app.add_plugins((
                 ClientInitPlug,
@@ -56,7 +57,6 @@ fn main() {
                 RotClientPlug,
             ));
         }
-
         _ => panic!("incorrect usage"),
     }
     app.run();

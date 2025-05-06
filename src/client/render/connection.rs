@@ -39,6 +39,8 @@ pub(crate) fn player_connected(
         }
         lobby.players.insert(client_id, player_entity_id);
         ents.entities.insert(player_entity_id, event.ent_id);
+
+
     }
 }
 
@@ -60,7 +62,7 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
                 ],
                 selected_hand: 0,
             })
-            .insert(Direction::Up)
+            .insert(Direction::Down)
             .id();
         player_entity_id
     } else {
