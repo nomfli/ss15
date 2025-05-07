@@ -40,9 +40,11 @@ pub fn mouse_coords_to_world(
     q_camera: Query<(&Camera, &GlobalTransform)>,
 ) {
     mouse.left_button = mouse_button.pressed(MouseButton::Left);
-    let window = q_windows.single();
+    let Ok(window) = q_windows.single() else {
+        return;
+    };
     if let Some(cursor_pos) = window.cursor_position() {
-        if let Ok((camera, camera_transform)) = q_camera.get_single() {
+        if let Ok((camera, camera_transform)) = q_camera.single() {
             match camera.viewport_to_world(camera_transform, cursor_pos) {
                 Ok(ray) => {
                     mouse.cords = Some(ray.origin.truncate());
