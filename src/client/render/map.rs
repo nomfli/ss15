@@ -1,5 +1,5 @@
 use crate::shared::{
-    map::{init_map_tmp, Map},
+    map::{init, load_map_tmp, Map},
     sprites::{SpriteName, Sprites},
 };
 use bevy::prelude::*;
@@ -8,7 +8,7 @@ pub(crate) struct ClientMapPlug;
 
 impl Plugin for ClientMapPlug {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, render_map.after(init_map_tmp));
+        app.add_systems(Startup, render_map.after(load_map_tmp).after(init));
     }
 }
 

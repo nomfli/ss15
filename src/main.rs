@@ -9,11 +9,8 @@ use crate::{
         network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
         render::{
             connection::ConnectionPlug, hands::HandsClientPlug, init::InitRenderPlug,
-<<<<<<< HEAD
-            input::InputClientPlug, movement::MovementClientPlug, rotation::RotClientPlug,
-=======
             input::InputClientPlug, map::ClientMapPlug, movement::MovementClientPlug,
->>>>>>> 9bead42 (fix wargs)
+            rotation::RotClientPlug,
         },
     },
     server::{
@@ -36,6 +33,7 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let exec_type = args[1].as_str();
     let mut app = App::new();
+
     app.add_plugins((
         DefaultPlugins,
         ResInitPlug,
