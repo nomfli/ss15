@@ -43,6 +43,7 @@ pub(crate) enum Direction {
     Right,
 }
 
+
 impl From<Direction> for usize {
     fn from(dir: Direction) -> usize {
         match dir {
@@ -53,3 +54,4 @@ impl From<Direction> for usize {
         }
     }
 }
+

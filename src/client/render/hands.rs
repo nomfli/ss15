@@ -75,6 +75,7 @@ pub fn try_to_grab(
                     panic!("problem with bimap entities can't find entity");
                 };
 
+
                 writer.write(TryToGrabEvent {
                     can_be_grabbed: *server_ent,
                     hand_idx: selected_idx,
@@ -84,12 +85,14 @@ pub fn try_to_grab(
     }
 }
 
+
 #[derive(Event, Debug)]
 
 pub struct ShouldGrab {
     pub i_must_be_grabbed: Entity,
     pub who_should_grab: ClientId,
 }
+
 pub fn grab_event_handler(
     lobby: Res<Lobby>,
     entities: Res<Entities>,

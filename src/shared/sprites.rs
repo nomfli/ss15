@@ -17,7 +17,6 @@ pub struct Sprites(pub HashMap<String, Sprite>);
 #[derive(Debug, Default, Component, Deserialize, Serialize, Clone)]
 pub struct SpriteName(pub String);
 
-
 pub fn init_sprites(
     mut sprites: ResMut<Sprites>,
     asset_server: Res<AssetServer>,

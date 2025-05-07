@@ -28,7 +28,6 @@ pub(crate) fn player_connected(
     mut commands: Commands,
     sprites: Res<Sprites>,
     mut ents: ResMut<Entities>,
-
 ) {
     for event in player_connected_ev.read() {
         let client_id = event.client_id;
@@ -46,7 +45,6 @@ pub(crate) fn player_connected(
 }
 
 fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sprites>) -> Entity {
-
     if let Some(sprite) = sprites.0.get("human") {
         let player_entity_id = commands
             .spawn(SpriteName("human".to_string()))
@@ -59,7 +57,6 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
                     },
                     Hand {
                         grab_ent: None,
-
                         hand_len: 100000.0,
                     },
                 ],

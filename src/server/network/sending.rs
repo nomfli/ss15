@@ -1,5 +1,4 @@
 use crate::{
-
     server::logic::hands::GrabAnsEvent,
     shared::{
         components::{Grabbable, Player, Speed},
@@ -74,7 +73,6 @@ pub(crate) fn send_speed(query: Query<(&Player, &Speed)>, mut server: ResMut<Ren
     }
 }
 
-
 pub(crate) fn send_throw_answer(
     mut server: ResMut<RenetServer>,
     mut throw_answer: EventReader<ThrowAnswerEvent>,
@@ -90,5 +88,3 @@ pub(crate) fn send_throw_answer(
         server.broadcast_message(DefaultChannel::Unreliable, throw_msg);
     }
 }
-
-
