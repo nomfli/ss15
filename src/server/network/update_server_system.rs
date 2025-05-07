@@ -1,5 +1,8 @@
 use crate::server::{
-    logic::{hands::{GrabEvent, ThrowEvent}, rotation::DirectionEvent},
+    logic::{
+        hands::{GrabEvent, ThrowEvent},
+        rotation::DirectionEvent,
+    },
     network::{connection::*, sending::SendItems},
 };
 
@@ -87,7 +90,6 @@ pub(crate) fn message_handler(
                     can_be_grabbed,
                     hand_idx,
                 }) => {
-
                     let Some(i_want_grab) = lobby.players.get(&client_id) else {
                         continue;
                     };

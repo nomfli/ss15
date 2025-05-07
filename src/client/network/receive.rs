@@ -2,6 +2,7 @@ use crate::client::render::{
     connection::PlayerConnected,
     hands::ShouldGrab,
     movement::{ChangePositions, SpeedEvent},
+    rotation::RotationClientEvent,
 };
 use crate::shared::{
     components::Grabbable,
@@ -27,6 +28,7 @@ type ReceiveEvents<'a> = (
     EventWriter<'a, ShouldGrab>,
     EventWriter<'a, SpeedEvent>,
     EventWriter<'a, ThrowAnswerEvent>,
+    EventWriter<'a, RotationClientEvent>,
 );
 
 pub(crate) fn receive_message(
@@ -35,7 +37,14 @@ pub(crate) fn receive_message(
     mut lobby: ResMut<Lobby>,
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
-    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut speed_event, mut throw_event): ReceiveEvents,
+    (
+        mut change_pos_ev,
+        mut user_connected_ev,
+        mut grab_event,
+        mut speed_event,
+        mut throw_event,
+        mut rot_ev,
+    ): ReceiveEvents,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -95,6 +104,9 @@ pub(crate) fn receive_message(
                     hand_idx,
                     where_throw,
                 });
+            }
+            Ok(ServerMessages::Direction(dir, server_ent)) => {
+                rot_ev.send(RotationClientEvent { dir, server_ent });
             }
             _ => {}
         }
