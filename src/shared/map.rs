@@ -1,5 +1,5 @@
 use crate::shared::sprites::SpriteName;
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers};
 use std::collections::HashMap;
 
 pub(crate) struct SharedMapPlug;
@@ -267,10 +267,22 @@ pub(crate) fn init(mut commands: Commands, map: Res<Map>) {
     map.into_iter().with_layer().for_each(|(layer, ent)| {
         commands.entity(*ent).insert(MapObject);
         match layer {
-            Layer::Floor => commands.entity(*ent).insert(MapFloor),
-            Layer::Wall => commands.entity(*ent).insert(MapWall),
-            Layer::Stationary => commands.entity(*ent).insert(MapStationary),
-            Layer::Entity => commands.entity(*ent).insert(MapEntity),
+            Layer::Floor => commands
+                .entity(*ent)
+                .insert(MapFloor)
+                .insert(RenderLayers::layer(1)),
+            Layer::Wall => commands
+                .entity(*ent)
+                .insert(MapWall)
+                .insert(RenderLayers::layer(3)),
+            Layer::Stationary => commands
+                .entity(*ent)
+                .insert(MapStationary)
+                .insert(RenderLayers::layer(2)),
+            Layer::Entity => commands
+                .entity(*ent)
+                .insert(MapEntity)
+                .insert(RenderLayers::layer(2)),
         };
     });
 }
