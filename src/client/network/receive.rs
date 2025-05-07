@@ -28,7 +28,7 @@ type ReceiveEvents<'a> = (
     EventWriter<'a, ShouldGrab>,
     EventWriter<'a, SpeedEvent>,
     EventWriter<'a, ThrowAnswerEvent>,
-    EventWriter<'a, Direction>,
+    EventWriter<'a, RotationClientEvent>,
 );
 
 pub(crate) fn receive_message(
@@ -43,7 +43,7 @@ pub(crate) fn receive_message(
         mut grab_event,
         mut speed_event,
         mut throw_event,
-        dir_ev,
+        mut dir_ev,
     ): ReceiveEvents,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
@@ -106,7 +106,7 @@ pub(crate) fn receive_message(
                 });
             }
             Ok(ServerMessages::Direction(dir, server_ent)) => {
-                dir_ev.write(RotationClientEvent { dir, server_ent })
+                dir_ev.write(RotationClientEvent { dir, server_ent });
             }
             _ => {}
         }
