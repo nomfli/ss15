@@ -22,7 +22,6 @@ impl Plugin for ClientNetworkPlug {
 }
 
 type ReceiveEvents<'a> = (
-    EventWriter<'a, ChangePositions>,
     EventWriter<'a, PlayerConnected>,
     EventWriter<'a, ShouldGrab>,
     EventWriter<'a, SpeedEvent>,
@@ -33,9 +32,10 @@ pub(crate) fn receive_message(
     mut commands: Commands,
     mut client: ResMut<RenetClient>,
     mut lobby: ResMut<Lobby>,
+    mut positions: ResMut<ChangePositions>,
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
-    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut speed_event, mut throw_event): ReceiveEvents,
+    (mut user_connected_ev, mut grab_event, mut speed_event, mut throw_event): ReceiveEvents,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -55,7 +55,17 @@ pub(crate) fn receive_message(
     while let Some(message) = client.receive_message(DefaultChannel::Unreliable) {
         match bincode::deserialize(&message) {
             Ok(ServerMessages::SendPositions(players)) => {
-                change_pos_ev.write(ChangePositions(players));
+                let updates: Vec<_> = players
+                    .iter()
+                    .filter_map(|(ent, cords)| {
+                        ents.entities
+                            .get_by_second(ent)
+                            .map(|client_ent| (*client_ent, *cords))
+                    })
+                    .collect();
+                for (client_ent, cords) in updates {
+                    positions.0.insert(client_ent, cords);
+                }
             }
 
             Ok(ServerMessages::AddItem(item)) => {

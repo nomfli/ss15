@@ -17,7 +17,7 @@ pub enum ServerMessages {
     PlayerDisconnected {
         id: ClientId,
     },
-    SendPositions(HashMap<ClientId, [f32; 2]>),
+    SendPositions(HashMap<Entity, [f32; 2]>),
     AddItem(([f32; 2], SpriteName, Entity, Grabbable)),
     Speed(Speed),
     Direction(Direction, Entity),

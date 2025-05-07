@@ -31,6 +31,7 @@ pub struct MovementInput {
     pub right: bool,
 }
 
+
 #[derive(Debug, Default)]
 pub struct Bimap<T, V> {
     to_second: HashMap<T, V>,

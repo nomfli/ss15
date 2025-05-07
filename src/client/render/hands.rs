@@ -58,6 +58,7 @@ pub fn try_to_grab(
         let Some(cur_pos) = mouse_input.cords else {
             return;
         };
+
         for (coords, sprite, ent, grabbable) in can_be_grabed.iter() {
             if !grabbable.0 {
                 continue;
@@ -111,8 +112,10 @@ pub fn grab_event_handler(
         if commands.get_entity(must_be_grabbed).is_err() {
             continue;
         }
+
         let selected_idx = hands.selected_hand;
         hands.all_hands[selected_idx].grab_ent = Some(must_be_grabbed);
+
         commands
             .entity(must_be_grabbed)
             .remove::<Sprite>()

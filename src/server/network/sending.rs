@@ -1,5 +1,4 @@
 use crate::{
-
     server::logic::hands::GrabAnsEvent,
     shared::{
         components::{Grabbable, Player, Speed},
@@ -51,6 +50,7 @@ pub(crate) fn send_items(
     }
 }
 
+
 pub(crate) fn send_grab_answer(
     mut server: ResMut<RenetServer>,
     mut grab_ansewer: EventReader<GrabAnsEvent>,
@@ -73,6 +73,7 @@ pub(crate) fn send_speed(query: Query<(&Player, &Speed)>, mut server: ResMut<Ren
         }
     }
 }
+
 
 
 pub(crate) fn send_throw_answer(

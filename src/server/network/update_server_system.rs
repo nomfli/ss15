@@ -100,12 +100,14 @@ pub(crate) fn message_handler(
                         client: client_id,
                     });
                 }
+
                 Ok(ClientMessages::Direction(dir)) => {
                     dir_ev.write(DirectionEvent {
                         client: client_id,
                         direction: dir,
                     });
                 }
+
                 Ok(ClientMessages::Throw {
                     selected_idx,
                     where_throw,

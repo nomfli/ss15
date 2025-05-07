@@ -1,9 +1,4 @@
-
-use crate::shared::{
-    components::{Player, Speed},
-    messages::ServerMessages,
-    resource::MovementInput,
-};
+use crate::shared::{components::Speed, messages::ServerMessages, resource::MovementInput};
 
 use bevy::prelude::*;
 use bevy_renet::renet::*;
@@ -13,9 +8,8 @@ use std::{collections::HashMap, fmt::Debug};
 pub(crate) const MAX_MOVE_SPEED: f32 = 1000.0;
 pub(crate) const ACCELERATION: f32 = 100.0;
 
-
 #[derive(Resource, Debug, Default, Serialize, Deserialize)]
-pub(crate) struct Positions(pub HashMap<ClientId, [f32; 2]>);
+pub(crate) struct Positions(pub HashMap<Entity, [f32; 2]>);
 
 #[derive(Component, Debug, Default, Serialize, Deserialize)]
 pub(crate) struct MaxSpeed(pub f32);
@@ -29,7 +23,7 @@ impl Plugin for MovementServerPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, move_players_system);
         app.add_systems(Update, velocity);
-        app.add_systems(Update, server_sync_players_movement::<Player>);
+        app.add_systems(Update, server_sync_players_movement);
         app.init_resource::<Positions>();
     }
 }
@@ -81,28 +75,18 @@ pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSp
     }
 }
 
-pub(crate) fn server_sync_players_movement<T: Component + Debug + Id>(
+pub(crate) fn server_sync_players_movement(
     mut server: ResMut<RenetServer>,
-    query: Query<(&Transform, &T)>,
+    query: Query<(&Transform, Entity)>,
     mut players: ResMut<Positions>,
 ) {
-    for (transform, object) in query.iter() {
+    for (transform, ent) in query.iter() {
         players
             .0
-            .insert(object.id(), transform.translation.truncate().into());
+            .insert(ent, transform.translation.truncate().into());
     }
     if let Ok(sync_message) = bincode::serialize(&ServerMessages::SendPositions(players.0.clone()))
     {
         server.broadcast_message(DefaultChannel::Unreliable, sync_message);
-    }
-}
-
-pub(crate) trait Id {
-    fn id(&self) -> u64;
-}
-
-impl Id for Player {
-    fn id(&self) -> u64 {
-        self.id
     }
 }

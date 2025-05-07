@@ -59,7 +59,6 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
                     },
                     Hand {
                         grab_ent: None,
-
                         hand_len: 100000.0,
                     },
                 ],
