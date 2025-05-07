@@ -51,7 +51,7 @@ pub fn grab_answer_handler(
                         < hands.all_hands[event.hand_idx].hand_len
                 {
                     {
-                        send_grab_ev.send(GrabAnsEvent {
+                        send_grab_ev.write(GrabAnsEvent {
                             can_be_grabbed: event.can_be_grabbed,
                             client: event.client,
                         });
@@ -100,7 +100,7 @@ pub(crate) fn throw_answer(
                 translation: Vec3::new(x, y, 0.0),
                 ..Default::default()
             });
-            answer.send(ThrowAnswerEvent {
+            answer.write(ThrowAnswerEvent {
                 hand_idx: event.selected_idx,
                 client: event.client,
                 where_throw: [x, y],

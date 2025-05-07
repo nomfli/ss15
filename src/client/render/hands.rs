@@ -75,7 +75,7 @@ pub fn try_to_grab(
                     panic!("problem with bimap entities can't find entity");
                 };
 
-                writer.send(TryToGrabEvent {
+                writer.write(TryToGrabEvent {
                     can_be_grabbed: *server_ent,
                     hand_idx: selected_idx,
                 });
@@ -108,7 +108,7 @@ pub fn grab_event_handler(
         else {
             continue;
         };
-        if commands.get_entity(must_be_grabbed).is_none() {
+        if commands.get_entity(must_be_grabbed).is_err() {
             continue;
         }
         let selected_idx = hands.selected_hand;
@@ -141,7 +141,7 @@ pub(crate) fn try_throw(
             return;
         };
         if keyboard.pressed(KeyCode::KeyQ) {
-            send_ev.send(SendTryThrow {
+            send_ev.write(SendTryThrow {
                 hand_idx,
                 where_throw,
             });
