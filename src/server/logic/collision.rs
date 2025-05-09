@@ -4,7 +4,7 @@ use crate::shared::{
     sprites::{SpriteName, Sprites},
 };
 use bevy::{
-    math::bounding::{Aabb2d, BoundingVolume, IntersectsVolume},
+    math::bounding::{Aabb2d, IntersectsVolume},
     prelude::*,
 };
 
@@ -14,13 +14,6 @@ impl Plugin for ServerCollisionPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, check_collisions);
     }
-}
-
-pub(crate) enum Collision {
-    Up,
-    Bottom,
-    Left,
-    Right,
 }
 
 pub(crate) fn check_collisions(
