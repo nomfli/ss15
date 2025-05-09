@@ -52,7 +52,8 @@ impl MapIterator {
             current_layer: Layer::Floor,
         }
     }
-    #[warn(dead_code)]
+
+    #[allow(dead_code)]
     pub fn with_layer(self) -> MapLayerIterator {
         MapLayerIterator { inner: self }
     }
