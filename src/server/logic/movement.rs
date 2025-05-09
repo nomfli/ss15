@@ -1,8 +1,10 @@
-
-use crate::shared::{
-    components::{Player, Speed},
-    messages::ServerMessages,
-    resource::MovementInput,
+use crate::{
+    server::logic::collision::check_collisions,
+    shared::{
+        components::{Player, Speed},
+        messages::ServerMessages,
+        resource::MovementInput,
+    },
 };
 
 use bevy::prelude::*;
@@ -12,7 +14,6 @@ use std::{collections::HashMap, fmt::Debug};
 
 pub(crate) const MAX_MOVE_SPEED: f32 = 1000.0;
 pub(crate) const ACCELERATION: f32 = 100.0;
-
 
 #[derive(Resource, Debug, Default, Serialize, Deserialize)]
 pub(crate) struct Positions(pub HashMap<ClientId, [f32; 2]>);
@@ -27,7 +28,7 @@ pub(crate) struct MovementServerPlug;
 
 impl Plugin for MovementServerPlug {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, move_players_system);
+        app.add_systems(Update, move_players_system.after(check_collisions));
         app.add_systems(Update, velocity);
         app.add_systems(Update, server_sync_players_movement::<Player>);
         app.init_resource::<Positions>();
