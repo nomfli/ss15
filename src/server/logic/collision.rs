@@ -1,6 +1,6 @@
 use crate::shared::{
     components::Speed,
-    map::Collisionable,
+    map::{init, Collisionable},
     sprites::{SpriteName, Sprites},
 };
 use bevy::{
@@ -12,7 +12,7 @@ pub(crate) struct ServerCollisionPlug;
 
 impl Plugin for ServerCollisionPlug {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, check_collisions);
+        app.add_systems(Update, check_collisions.after(init));
     }
 }
 
@@ -68,7 +68,7 @@ pub(crate) fn check_collisions(
 
         if x_collision {
             position.x -= 2.0 * velocity.x;
-            speed.x = 0.0;
+            speed.x *= -1.0;
         }
 
         position.y += velocity.y;
@@ -87,7 +87,7 @@ pub(crate) fn check_collisions(
 
         if y_collision {
             position.y -= 2.0 * velocity.y;
-            speed.y = 0.0;
+            speed.y *= -1.0;
         }
 
         transform.translation.x = position.x;
