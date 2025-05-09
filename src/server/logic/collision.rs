@@ -1,7 +1,10 @@
-use crate::shared::{
-    components::Speed,
-    map::{init, Collisionable},
-    sprites::{SpriteName, Sprites},
+use crate::{
+    server::logic::movement::{move_players_system, velocity},
+    shared::{
+        components::Speed,
+        map::{init, Collisionable},
+        sprites::{SpriteName, Sprites},
+    },
 };
 use bevy::{
     math::bounding::{Aabb2d, IntersectsVolume},
@@ -12,7 +15,13 @@ pub(crate) struct ServerCollisionPlug;
 
 impl Plugin for ServerCollisionPlug {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, check_collisions.after(init));
+        app.add_systems(
+            Update,
+            check_collisions
+                .after(init)
+                .before(move_players_system)
+                .before(velocity),
+        );
     }
 }
 
