@@ -21,7 +21,7 @@ pub(crate) fn init(sprites: Res<Sprites>, mut commands: Commands) {
         .spawn(sprite.clone())
         .insert(SpriteName(name))
         .insert(Transform {
-            translation: Vec3::new(0.0, 0.0, 0.0),
+            translation: Vec3::new(100.0, 100.0, 0.0),
             ..Default::default()
         })
         .insert(Grabbable(true));

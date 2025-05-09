@@ -51,23 +51,27 @@ pub fn init_sprites(
     let simple_wall = "simple_wall".to_string();
     sprites.0.insert(
         simple_wall,
-        Sprite::from_atlas_image(
-            texture_handle.clone(),
-            TextureAtlas {
+        Sprite {
+            image: texture_handle.clone(),
+            texture_atlas: Some(TextureAtlas {
                 layout: texture_atlas_layout.clone(),
                 index: 1,
-            },
-        ),
+            }),
+            custom_size: Some(Vec2::new(64.0, 64.0)),
+            ..Default::default()
+        },
     );
     let simple_floor = "simple_floor".to_string();
     sprites.0.insert(
         simple_floor,
-        Sprite::from_atlas_image(
-            texture_handle,
-            TextureAtlas {
-                layout: texture_atlas_layout,
+        Sprite {
+            image: texture_handle.clone(),
+            texture_atlas: Some(TextureAtlas {
+                layout: texture_atlas_layout.clone(),
                 index: 0,
-            },
-        ),
+            }),
+            custom_size: Some(Vec2::new(64.0, 64.0)),
+            ..Default::default()
+        },
     );
 }

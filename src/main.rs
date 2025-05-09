@@ -15,8 +15,8 @@ use crate::{
     },
     server::{
         logic::{
-            hands::HandsServerPlug, init::ServerInitPlug, movement::MovementServerPlug,
-            rotation::RotServerPlug,
+            collision::ServerCollisionPlug, hands::HandsServerPlug, init::ServerInitPlug,
+            movement::MovementServerPlug, rotation::RotServerPlug,
         },
         network::{
             connection::ConnectionHandlerPlug, init::StartupServerPlug, sending::ServerSendPlug,
@@ -52,6 +52,7 @@ fn main() {
                 UpdateServerPlug,
                 HandsServerPlug,
                 RotServerPlug,
+                ServerCollisionPlug,
             ));
         }
         "client" => {

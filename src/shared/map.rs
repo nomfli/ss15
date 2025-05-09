@@ -231,16 +231,7 @@ impl<'a> IntoIterator for &'a Map {
 pub(crate) struct MapObject;
 
 #[derive(Debug, Component)]
-pub(crate) struct MapFloor;
-
-#[derive(Debug, Component)]
-pub(crate) struct MapWall;
-
-#[derive(Debug, Component)]
-pub(crate) struct MapStationary;
-
-#[derive(Debug, Component)]
-pub(crate) struct MapEntity;
+pub(crate) struct Collisionable;
 
 pub(crate) fn load_map_tmp(mut commands: Commands, mut map: ResMut<Map>) {
     //tempory system to spawn
@@ -255,9 +246,19 @@ pub(crate) fn load_map_tmp(mut commands: Commands, mut map: ResMut<Map>) {
             if j == 0 || i == 0 || i == 5 || j == 5 {
                 let ent = commands.spawn(SpriteName("simple_wall".to_string())).id();
                 map.wall.insert(coords, ent);
+                commands.entity(ent).insert(Transform::from_xyz(
+                    (i * 64) as f32,
+                    (j * 64) as f32,
+                    0.0,
+                ));
             } else {
                 let ent = commands.spawn(SpriteName("simple_floor".to_string())).id();
                 map.floor.insert(coords, ent);
+                commands.entity(ent).insert(Transform::from_xyz(
+                    (i * 64) as f32,
+                    (j * 64) as f32,
+                    0.0,
+                ));
             }
         }
     }
@@ -267,22 +268,13 @@ pub(crate) fn init(mut commands: Commands, map: Res<Map>) {
     map.into_iter().with_layer().for_each(|(layer, ent)| {
         commands.entity(*ent).insert(MapObject);
         match layer {
-            Layer::Floor => commands
-                .entity(*ent)
-                .insert(MapFloor)
-                .insert(RenderLayers::layer(1)),
+            Layer::Floor => commands.entity(*ent).insert(RenderLayers::layer(1)),
             Layer::Wall => commands
                 .entity(*ent)
-                .insert(MapWall)
+                .insert(Collisionable)
                 .insert(RenderLayers::layer(3)),
-            Layer::Stationary => commands
-                .entity(*ent)
-                .insert(MapStationary)
-                .insert(RenderLayers::layer(2)),
-            Layer::Entity => commands
-                .entity(*ent)
-                .insert(MapEntity)
-                .insert(RenderLayers::layer(2)),
+            Layer::Stationary => commands.entity(*ent).insert(RenderLayers::layer(2)),
+            Layer::Entity => commands.entity(*ent).insert(RenderLayers::layer(2)),
         };
     });
 }

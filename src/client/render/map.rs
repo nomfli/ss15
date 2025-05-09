@@ -12,30 +12,21 @@ impl Plugin for ClientMapPlug {
     }
 }
 
-pub(crate) fn render_map(
+pub fn render_map(
     mut commands: Commands,
     map: Res<Map>,
-    query: Query<&SpriteName>,
+    query: Query<(Entity, &SpriteName)>,
     sprites: Res<Sprites>,
 ) {
-    let render_entity = |commands: &mut Commands, (x, y), ent| {
-        commands.entity(ent).insert(Transform {
-            translation: Vec3::new(x as f32, y as f32, 0.0),
-            ..Default::default()
+    map.iter()
+        .filter_map(|entity| query.get(*entity).ok())
+        .filter_map(|(ent, sprite_name)| {
+            sprites
+                .0
+                .get(&sprite_name.0)
+                .map(|sprite| (ent, sprite.clone()))
+        })
+        .for_each(|(entity, sprite)| {
+            commands.entity(entity).insert(sprite);
         });
-        if let Some(sprite) = query
-            .get(ent)
-            .ok()
-            .and_then(|sprite_name| sprites.0.get(&sprite_name.0))
-        {
-            commands.entity(ent).insert(sprite.clone());
-        }
-    };
-
-    map.floor
-        .iter()
-        .for_each(|(&(x, y), ent)| render_entity(&mut commands, (x, y), *ent));
-    map.wall
-        .iter()
-        .for_each(|(&(x, y), ent)| render_entity(&mut commands, (x, y), *ent));
 }
