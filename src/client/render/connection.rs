@@ -3,7 +3,7 @@ use crate::shared::{
     resource::{Entities, Lobby},
     sprites::{SpriteName, Sprites},
 };
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers};
 use bevy_renet::netcode::NetcodeClientTransport;
 
 pub struct ConnectionPlug;
@@ -62,6 +62,7 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
                 selected_hand: 0,
             })
             .insert(Direction::Down)
+            .insert(RenderLayers::layer(2))
             .id();
         player_entity_id
     } else {

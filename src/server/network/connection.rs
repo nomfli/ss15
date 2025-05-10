@@ -3,6 +3,7 @@ use crate::shared::{
     components::{Hand, Hands, Player, Speed},
     messages::ServerMessages,
     resource::Lobby,
+    sprites::SpriteName,
 };
 
 use bevy::prelude::*;
@@ -65,11 +66,7 @@ pub(crate) fn client_connection_handler(
 
 pub(crate) fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> Entity {
     let ent = commands
-        .spawn(Sprite {
-            color: Color::srgb_u8(255, 0, 0),
-            custom_size: Some(Vec2::new(100.0, 100.0)),
-            ..Default::default()
-        })
+        .spawn(SpriteName("human".to_string()))
         .insert(Player { id: *client_id })
         .insert(Hands {
             all_hands: vec![
@@ -87,6 +84,7 @@ pub(crate) fn spawn_player_server(commands: &mut Commands, client_id: &u64) -> E
         .insert(Acceleration(ACCELERATION))
         .insert(MaxSpeed(MAX_MOVE_SPEED))
         .insert(Speed { x: 0.0, y: 0.0 })
+        .insert(Transform::from_xyz(100.0, 100.0, 0.0))
         .id();
     ent
 }
