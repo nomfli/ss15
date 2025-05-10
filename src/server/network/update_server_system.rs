@@ -1,6 +1,8 @@
 use crate::server::{
-    logic::{hands::{GrabEvent, ThrowAwayEvent, ThrowEvent}, rotation::DirectionEvent},
-
+    logic::{
+        hands::{GrabEvent, ThrowAwayEvent, ThrowEvent},
+        rotation::DirectionEvent,
+    },
     network::{connection::*, sending::SendItems},
 };
 
@@ -119,6 +121,7 @@ pub(crate) fn message_handler(
                         where_throw,
                     });
                 }
+                Ok(ClientMessages::ThrowAway {
                     where_throw,
                     hand_idx,
                 }) => {

@@ -42,7 +42,7 @@ pub(crate) fn receive_message(
         mut grab_event,
         mut speed_event,
         mut throw_event,
-        throw_away_event,
+        mut throw_away_event,
     ): ReceiveEvents,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {

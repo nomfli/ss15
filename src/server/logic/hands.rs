@@ -1,10 +1,7 @@
-use crate::{
-    server::logic::movement::Speed,
-    shared::{
-        components::{Grabbable, Hands},
-        events::ThrowAnswerEvent,
-        resource::Lobby,
-    },
+use crate::shared::{
+    components::{Grabbable, Hands, Speed},
+    events::ThrowAnswerEvent,
+    resource::Lobby,
 };
 
 use bevy::prelude::*;
