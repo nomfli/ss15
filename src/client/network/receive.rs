@@ -1,6 +1,6 @@
 use crate::client::render::{
     connection::PlayerConnected,
-    hands::ShouldGrab,
+    hands::{ShouldGrab, ThrowAwayAnswer},
     movement::{ChangePositions, SpeedEvent},
 };
 use crate::shared::{
@@ -27,6 +27,7 @@ type ReceiveEvents<'a> = (
     EventWriter<'a, ShouldGrab>,
     EventWriter<'a, SpeedEvent>,
     EventWriter<'a, ThrowAnswerEvent>,
+    EventWriter<'a, ThrowAwayAnswer>,
 );
 
 pub(crate) fn receive_message(
@@ -35,7 +36,14 @@ pub(crate) fn receive_message(
     mut lobby: ResMut<Lobby>,
     mut ents: ResMut<Entities>,
     sprites: Res<Sprites>,
-    (mut change_pos_ev, mut user_connected_ev, mut grab_event, mut speed_event, mut throw_event): ReceiveEvents,
+    (
+        mut change_pos_ev,
+        mut user_connected_ev,
+        mut grab_event,
+        mut speed_event,
+        mut throw_event,
+        throw_away_event,
+    ): ReceiveEvents,
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
         let server_message = bincode::deserialize(&message).unwrap();
@@ -94,6 +102,15 @@ pub(crate) fn receive_message(
                     client: client_id,
                     hand_idx,
                     where_throw,
+                });
+            }
+            Ok(ServerMessages::ThrowAwayAnswer {
+                client_id,
+                hand_idx,
+            }) => {
+                throw_away_event.write(ThrowAwayAnswer {
+                    hand_idx,
+                    client: client_id,
                 });
             }
             _ => {}

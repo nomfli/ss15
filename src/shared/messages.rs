@@ -27,7 +27,10 @@ pub enum ServerMessages {
         hand_idx: usize,
         where_throw: [f32; 2],
     },
-
+    ThrowAwayAnswer {
+        client_id: ClientId,
+        hand_idx: usize,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize, Component)]
@@ -46,5 +49,9 @@ pub enum ClientMessages {
     Throw {
         selected_idx: usize,
         where_throw: Vec2,
+    },
+    ThrowAway {
+        where_throw: Vec2,
+        hand_idx: usize,
     },
 }
