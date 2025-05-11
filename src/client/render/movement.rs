@@ -29,7 +29,6 @@ pub(crate) fn change_position(
         let players = &event.0;
         for (player_id, transition) in players.iter() {
             let Some(player_entity) = entities.entities.get_by_second(player_id) else {
-                println!("BLYAT");
                 continue;
             };
             let [x, y] = *transition;

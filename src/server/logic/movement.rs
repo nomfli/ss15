@@ -1,5 +1,5 @@
 use crate::{
-    server::logic::collision::check_collisions,
+    server::{logic::collision::check_collisions, network::sending::send_throw_away_answer},
     shared::{
         components::{Player, Speed},
         messages::ServerMessages,
@@ -30,7 +30,10 @@ impl Plugin for MovementServerPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, move_players_system.after(check_collisions));
         app.add_systems(Update, velocity);
-        app.add_systems(Update, server_sync_players_movement);
+        app.add_systems(
+            Update,
+            server_sync_players_movement.before(send_throw_away_answer),
+        );
         app.init_resource::<Positions>();
     }
 }
@@ -76,7 +79,6 @@ pub(crate) fn velocity(
         transform.translation.y += speed.y * time.delta_secs();
         speed.x *= 0.95;
         speed.y *= 0.95;
-        println!("{:?}", (transform.translation, speed.clone(), ent));
         if speed.x.abs() < 0.1 {
             speed.x = 0.0;
         }
