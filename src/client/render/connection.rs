@@ -1,5 +1,5 @@
 use crate::shared::{
-    components::{Direction, Hand, Hands, PlayerEntity},
+    components::{Direction, Hand, Hands, PlayerEntity, Speed},
     resource::{Entities, Lobby},
     sprites::{SpriteName, Sprites},
 };
@@ -63,6 +63,7 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
             })
             .insert(Direction::Down)
             .insert(RenderLayers::layer(2))
+            .insert(Speed { x: 0.0, y: 0.0 })
             .id();
         player_entity_id
     } else {

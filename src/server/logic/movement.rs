@@ -71,6 +71,7 @@ pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSp
         }
         transform.translation.x += speed.x * time.delta_secs();
         transform.translation.y += speed.y * time.delta_secs();
+        println!("{:?}", transform.translation);
         speed.x *= 0.95;
         speed.y *= 0.95;
         if speed.x.abs() < 0.1 {

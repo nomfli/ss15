@@ -108,6 +108,7 @@ pub(crate) fn receive_message(
                 client_id,
                 hand_idx,
             }) => {
+                print!("IWASHERE0");
                 throw_away_event.write(ThrowAwayAnswer {
                     hand_idx,
                     client: client_id,

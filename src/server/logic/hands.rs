@@ -122,7 +122,6 @@ pub(crate) struct ThrowAwayEvent {
 pub(crate) fn throw_away_handled(
     mut throw_away_ev: EventReader<ThrowAwayEvent>,
     mut i_want_throw_away: Query<(&mut Hands, &Transform)>,
-    mut i_want_freedom: Query<&mut Speed>,
     lobby: Res<Lobby>,
     mut commands: Commands,
     mut writer: EventWriter<ThrowAwayAnswerEvent>,
@@ -138,17 +137,21 @@ pub(crate) fn throw_away_handled(
             continue;
         };
         hands.all_hands[event.hand_idx].grab_ent = None;
-        let Ok(mut speed) = i_want_freedom.get_mut(grabbed_ent) else {
-            continue;
-        };
-        commands
-            .entity(grabbed_ent)
-            .insert(player_transform.clone());
         let direction = event.where_throw - player_transform.translation.truncate();
         let item_speed =
             Vec2::new(direction.x.sqrt(), direction.y.sqrt()) * ((2.0 * 0.95) as f32).sqrt();
-        speed.x = item_speed.x;
-        speed.y = item_speed.y;
+
+        commands
+            .entity(grabbed_ent)
+            .insert(Transform {
+                translation: player_transform.translation.clone(),
+                ..Default::default()
+            })
+            .insert(Speed {
+                x: item_speed.x,
+                y: item_speed.y,
+            });
+
         writer.write(ThrowAwayAnswerEvent {
             client_id: event.client_id,
             hand_idx: event.hand_idx,

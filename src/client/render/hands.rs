@@ -47,13 +47,13 @@ pub struct TryToGrabEvent {
 }
 
 pub fn try_to_grab(
-    i_want_grab: Query<(&Hands, &PlayerEntity)>,
+    i_want_grab: Query<&Hands, With<PlayerEntity>>,
     can_be_grabed: Query<(&Transform, &Sprite, Entity, &Grabbable)>,
     entities: Res<Entities>,
     mouse_input: Res<Mouse>,
     mut writer: EventWriter<TryToGrabEvent>,
 ) {
-    for (hands, _) in i_want_grab.iter() {
+    for hands in i_want_grab.iter() {
         let selected_idx = hands.selected_hand;
         if hands.all_hands[selected_idx].grab_ent.is_some() {
             return;
@@ -143,7 +143,7 @@ pub(crate) fn try_throw(
         let Some(where_throw) = mouse_input.cords else {
             return;
         };
-        if keyboard.pressed(KeyCode::KeyQ) {
+        if keyboard.pressed(KeyCode::KeyQ) && !keyboard.pressed(KeyCode::ShiftLeft) {
             send_ev.write(SendTryThrow {
                 hand_idx,
                 where_throw,
@@ -194,7 +194,7 @@ pub(crate) fn try_throw_away(
     mut throw_away_ev: EventWriter<TryThrowAway>,
 ) {
     for hands in player.iter_mut() {
-        if keyboard.pressed(KeyCode::ShiftRight) && keyboard.pressed(KeyCode::KeyQ) {
+        if keyboard.pressed(KeyCode::ShiftLeft) && keyboard.pressed(KeyCode::KeyQ) {
             let selected_idx = hands.selected_hand;
             let Some(_) = hands.all_hands[selected_idx].grab_ent else {
                 return;
@@ -225,7 +225,7 @@ pub(crate) struct ThrowAwayAnswer {
 pub(crate) fn throw_away_handler(
     mut reader: EventReader<ThrowAwayAnswer>,
     lobby: Res<Lobby>,
-    mut player: Query<&mut Hands>,
+    mut player: Query<(&mut Hands, &Transform)>,
     i_am_grabbed: Query<&SpriteName>,
     mut commands: Commands,
     sprites: Res<Sprites>,
@@ -234,7 +234,7 @@ pub(crate) fn throw_away_handler(
         let Some(player_ent) = lobby.players.get(&event.client) else {
             continue;
         };
-        let Ok(mut hands) = player.get_mut(*player_ent) else {
+        let Ok((mut hands, transform)) = player.get_mut(*player_ent) else {
             continue;
         };
         let Some(grabbed_ent) = hands.all_hands[event.hand_idx].grab_ent else {
@@ -247,6 +247,13 @@ pub(crate) fn throw_away_handler(
         let Some(sprite) = sprites.0.get(&name.0) else {
             continue;
         };
-        commands.entity(grabbed_ent).insert(sprite.clone());
+
+        commands
+            .entity(grabbed_ent)
+            .insert(sprite.clone())
+            .insert(Transform {
+                translation: transform.translation.clone(),
+                ..Default::default()
+            });
     }
 }
