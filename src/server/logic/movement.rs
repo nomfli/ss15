@@ -16,7 +16,7 @@ pub(crate) const MAX_MOVE_SPEED: f32 = 1000.0;
 pub(crate) const ACCELERATION: f32 = 100.0;
 
 #[derive(Resource, Debug, Default, Serialize, Deserialize)]
-pub(crate) struct Positions(pub HashMap<ClientId, [f32; 2]>);
+pub(crate) struct Positions(pub HashMap<Entity, [f32; 2]>);
 
 #[derive(Component, Debug, Default, Serialize, Deserialize)]
 pub(crate) struct MaxSpeed(pub f32);
@@ -30,7 +30,7 @@ impl Plugin for MovementServerPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, move_players_system.after(check_collisions));
         app.add_systems(Update, velocity);
-        app.add_systems(Update, server_sync_players_movement::<Player>);
+        app.add_systems(Update, server_sync_players_movement);
         app.init_resource::<Positions>();
     }
 }
@@ -60,8 +60,11 @@ pub(crate) fn move_players_system(mut query: Query<(&MovementInput, &Acceleratio
     }
 }
 
-pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSpeed, &mut Speed)>) {
-    for (mut transform, max_speed, mut speed) in query.iter_mut() {
+pub(crate) fn velocity(
+    time: Res<Time>,
+    mut query: Query<(&mut Transform, &MaxSpeed, &mut Speed, Entity)>,
+) {
+    for (mut transform, max_speed, mut speed, ent) in query.iter_mut() {
         let speed_vec = Vec2::new(speed.x, speed.y);
         let max_speed_value = max_speed.0;
         if speed_vec.length() > max_speed_value {
@@ -71,9 +74,9 @@ pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSp
         }
         transform.translation.x += speed.x * time.delta_secs();
         transform.translation.y += speed.y * time.delta_secs();
-        println!("{:?}", transform.translation);
         speed.x *= 0.95;
         speed.y *= 0.95;
+        println!("{:?}", (transform.translation, speed.clone(), ent));
         if speed.x.abs() < 0.1 {
             speed.x = 0.0;
         }
@@ -83,17 +86,18 @@ pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSp
     }
 }
 
-pub(crate) fn server_sync_players_movement<T: Component + Debug + Id>(
+pub(crate) fn server_sync_players_movement(
     mut server: ResMut<RenetServer>,
-    query: Query<(&Transform, &T)>,
-    mut players: ResMut<Positions>,
+    query: Query<(&Transform, Entity)>,
+    mut positions: ResMut<Positions>,
 ) {
-    for (transform, object) in query.iter() {
-        players
+    for (transform, ent) in query.iter() {
+        positions
             .0
-            .insert(object.id(), transform.translation.truncate().into());
+            .insert(ent, transform.translation.truncate().into());
     }
-    if let Ok(sync_message) = bincode::serialize(&ServerMessages::SendPositions(players.0.clone()))
+    if let Ok(sync_message) =
+        bincode::serialize(&ServerMessages::SendPositions(positions.0.clone()))
     {
         server.broadcast_message(DefaultChannel::Unreliable, sync_message);
     }

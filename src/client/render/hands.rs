@@ -247,13 +247,6 @@ pub(crate) fn throw_away_handler(
         let Some(sprite) = sprites.0.get(&name.0) else {
             continue;
         };
-
-        commands
-            .entity(grabbed_ent)
-            .insert(sprite.clone())
-            .insert(Transform {
-                translation: transform.translation.clone(),
-                ..Default::default()
-            });
+        commands.entity(grabbed_ent).insert(sprite.clone());
     }
 }

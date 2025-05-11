@@ -137,10 +137,7 @@ pub(crate) fn throw_away_handled(
             continue;
         };
         hands.all_hands[event.hand_idx].grab_ent = None;
-        let direction = event.where_throw - player_transform.translation.truncate();
-        let item_speed =
-            Vec2::new(direction.x.sqrt(), direction.y.sqrt()) * ((2.0 * 0.95) as f32).sqrt();
-
+        let item_speed = (event.where_throw - player_transform.translation.truncate()) * 0.95;
         commands
             .entity(grabbed_ent)
             .insert(Transform {

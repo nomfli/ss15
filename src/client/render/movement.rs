@@ -1,6 +1,6 @@
 use crate::shared::{
     components::{PlayerEntity, Speed},
-    resource::Lobby,
+    resource::Entities,
 };
 
 use bevy::prelude::*;
@@ -18,25 +18,26 @@ impl Plugin for MovementClientPlug {
 }
 
 #[derive(Default, Debug, Clone, Event)]
-pub(crate) struct ChangePositions(pub HashMap<u64, [f32; 2]>);
+pub(crate) struct ChangePositions(pub HashMap<Entity, [f32; 2]>);
 
 pub(crate) fn change_position(
     mut change_pos_ev: EventReader<ChangePositions>,
-    lobby: Res<Lobby>,
+    entities: Res<Entities>,
     mut commands: Commands,
 ) {
     for event in change_pos_ev.read() {
         let players = &event.0;
         for (player_id, transition) in players.iter() {
-            let Some(player_entity) = lobby.players.get(player_id) else {
+            let Some(player_entity) = entities.entities.get_by_second(player_id) else {
+                println!("BLYAT");
                 continue;
             };
             let [x, y] = *transition;
-            let transform = Transform {
+            let transform = &Transform {
                 translation: Vec3::new(x, y, 0.0),
                 ..Default::default()
             };
-            commands.entity(*player_entity).insert(transform);
+            commands.entity(*player_entity).insert(*transform);
         }
     }
 }
@@ -46,11 +47,11 @@ pub(crate) struct SpeedEvent(pub Speed);
 
 pub(crate) fn change_speed(
     mut speed_ev: EventReader<SpeedEvent>,
-    query: Query<(Entity, &PlayerEntity)>,
+    query: Query<Entity, With<PlayerEntity>>,
     mut commands: Commands,
 ) {
     for event in speed_ev.read() {
-        for (ent, _) in query.iter() {
+        for ent in query.iter() {
             commands.entity(ent).insert(event.0);
         }
     }
