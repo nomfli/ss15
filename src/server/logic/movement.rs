@@ -1,10 +1,6 @@
 use crate::{
     server::{logic::collision::check_collisions, network::sending::send_throw_away_answer},
-    shared::{
-        components::{Player, Speed},
-        messages::ServerMessages,
-        resource::MovementInput,
-    },
+    shared::{components::Speed, messages::ServerMessages, resource::MovementInput},
 };
 
 use bevy::prelude::*;
@@ -63,11 +59,8 @@ pub(crate) fn move_players_system(mut query: Query<(&MovementInput, &Acceleratio
     }
 }
 
-pub(crate) fn velocity(
-    time: Res<Time>,
-    mut query: Query<(&mut Transform, &MaxSpeed, &mut Speed, Entity)>,
-) {
-    for (mut transform, max_speed, mut speed, ent) in query.iter_mut() {
+pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSpeed, &mut Speed)>) {
+    for (mut transform, max_speed, mut speed) in query.iter_mut() {
         let speed_vec = Vec2::new(speed.x, speed.y);
         let max_speed_value = max_speed.0;
         if speed_vec.length() > max_speed_value {
@@ -102,15 +95,5 @@ pub(crate) fn server_sync_players_movement(
         bincode::serialize(&ServerMessages::SendPositions(positions.0.clone()))
     {
         server.broadcast_message(DefaultChannel::Unreliable, sync_message);
-    }
-}
-
-pub(crate) trait Id {
-    fn id(&self) -> u64;
-}
-
-impl Id for Player {
-    fn id(&self) -> u64 {
-        self.id
     }
 }
