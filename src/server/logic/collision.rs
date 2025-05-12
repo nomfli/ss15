@@ -77,7 +77,7 @@ pub(crate) fn check_collisions(
 
         if x_collision {
             position.x -= 2.0 * velocity.x;
-            speed.x *= -1.0;
+            speed.x = 0.0;
         }
 
         position.y += velocity.y;
@@ -96,7 +96,7 @@ pub(crate) fn check_collisions(
 
         if y_collision {
             position.y -= 2.0 * velocity.y;
-            speed.y *= -1.0;
+            speed.y = 0.0;
         }
 
         transform.translation.x = position.x;
