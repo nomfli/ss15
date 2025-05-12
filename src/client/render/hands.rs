@@ -251,6 +251,6 @@ pub(crate) fn throw_away_handler(
         commands
             .entity(grabbed_ent)
             .insert(sprite.clone())
-            .insert(transform.clone());
+            .insert(*transform);
     }
 }
