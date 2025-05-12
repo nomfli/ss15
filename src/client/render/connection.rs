@@ -1,9 +1,9 @@
 use crate::shared::{
-    components::{Direction, Hand, Hands, PlayerEntity},
+    components::{Direction, Hand, Hands, PlayerEntity, Speed},
     resource::{Entities, Lobby},
     sprites::{SpriteName, Sprites},
 };
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers};
 use bevy_renet::netcode::NetcodeClientTransport;
 
 pub struct ConnectionPlug;
@@ -28,7 +28,6 @@ pub(crate) fn player_connected(
     mut commands: Commands,
     sprites: Res<Sprites>,
     mut ents: ResMut<Entities>,
-
 ) {
     for event in player_connected_ev.read() {
         let client_id = event.client_id;
@@ -40,13 +39,10 @@ pub(crate) fn player_connected(
         }
         lobby.players.insert(client_id, player_entity_id);
         ents.entities.insert(player_entity_id, event.ent_id);
-
-
     }
 }
 
 fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sprites>) -> Entity {
-
     if let Some(sprite) = sprites.0.get("human") {
         let player_entity_id = commands
             .spawn(SpriteName("human".to_string()))
@@ -66,6 +62,8 @@ fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sp
                 selected_hand: 0,
             })
             .insert(Direction::Down)
+            .insert(RenderLayers::layer(2))
+            .insert(Speed { x: 0.0, y: 0.0 })
             .id();
         player_entity_id
     } else {

@@ -1,6 +1,7 @@
 use crate::shared::{
-    components::{Grabbable, Hands},
+    components::{Grabbable, Hands, Speed},
     events::ThrowAnswerEvent,
+    resource::Lobby,
 };
 
 use bevy::prelude::*;
@@ -13,8 +14,11 @@ impl Plugin for HandsServerPlug {
         app.add_event::<GrabEvent>();
         app.add_event::<GrabAnsEvent>();
         app.add_event::<ThrowEvent>();
+        app.add_event::<ThrowAwayEvent>();
+        app.add_event::<ThrowAwayAnswerEvent>();
         app.add_systems(Update, grab_answer_handler);
         app.add_systems(Update, throw_answer);
+        app.add_systems(Update, throw_away_handled);
     }
 }
 
@@ -31,7 +35,6 @@ pub(crate) struct GrabAnsEvent {
     pub can_be_grabbed: Entity,
     pub client: ClientId,
 }
-
 
 pub fn grab_answer_handler(
     mut grab_ev: EventReader<GrabEvent>,
@@ -107,4 +110,54 @@ pub(crate) fn throw_answer(
             });
         }
     }
+}
+
+#[derive(Event, Debug)]
+pub(crate) struct ThrowAwayEvent {
+    pub where_throw: Vec2,
+    pub hand_idx: usize,
+    pub client_id: ClientId,
+}
+
+pub(crate) fn throw_away_handled(
+    mut throw_away_ev: EventReader<ThrowAwayEvent>,
+    mut i_want_throw_away: Query<(&mut Hands, &Transform)>,
+    lobby: Res<Lobby>,
+    mut commands: Commands,
+    mut writer: EventWriter<ThrowAwayAnswerEvent>,
+) {
+    for event in throw_away_ev.read() {
+        let Some(player_ent) = lobby.players.get(&event.client_id) else {
+            continue;
+        };
+        let Ok((mut hands, player_transform)) = i_want_throw_away.get_mut(*player_ent) else {
+            continue;
+        };
+        let Some(grabbed_ent) = hands.all_hands[event.hand_idx].grab_ent else {
+            continue;
+        };
+        hands.all_hands[event.hand_idx].grab_ent = None;
+        let item_speed = (event.where_throw - player_transform.translation.truncate()) * 0.95;
+        commands
+            .entity(grabbed_ent)
+            .insert(Transform {
+                translation: player_transform.translation,
+                ..Default::default()
+            })
+            .insert(Speed {
+                x: item_speed.x,
+                y: item_speed.y,
+            });
+
+        writer.write(ThrowAwayAnswerEvent {
+            client_id: event.client_id,
+            hand_idx: event.hand_idx,
+        });
+    }
+}
+
+#[derive(Event, Debug)]
+pub(crate) struct ThrowAwayAnswerEvent {
+    pub client_id: ClientId,
+    pub hand_idx: usize,
 }

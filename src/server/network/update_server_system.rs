@@ -1,6 +1,6 @@
 use crate::server::{
     logic::{
-        hands::{GrabEvent, ThrowEvent},
+        hands::{GrabEvent, ThrowAwayEvent, ThrowEvent},
         rotation::DirectionEvent,
     },
     network::{connection::*, sending::SendItems},
@@ -64,6 +64,7 @@ pub(crate) fn message_handler(
     mut grab_ev: EventWriter<GrabEvent>,
     mut dir_ev: EventWriter<DirectionEvent>,
     mut throw_ev: EventWriter<ThrowEvent>,
+    mut throw_away_ev: EventWriter<ThrowAwayEvent>,
 ) {
     for client_id in server.clients_id() {
         while let Some(message) = server.receive_message(client_id, DefaultChannel::Unreliable) {
@@ -120,6 +121,17 @@ pub(crate) fn message_handler(
                         where_throw,
                     });
                 }
+                Ok(ClientMessages::ThrowAway {
+                    where_throw,
+                    hand_idx,
+                }) => {
+                    throw_away_ev.write(ThrowAwayEvent {
+                        client_id,
+                        hand_idx,
+                        where_throw,
+                    });
+                }
+
                 Err(_) => {}
             }
         }
