@@ -141,7 +141,7 @@ pub(crate) fn throw_away_handled(
         commands
             .entity(grabbed_ent)
             .insert(Transform {
-                translation: player_transform.translation.clone(),
+                translation: player_transform.translation,
                 ..Default::default()
             })
             .insert(Speed {
