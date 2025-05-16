@@ -8,8 +8,9 @@ use crate::{
     client::{
         network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
         render::{
-            connection::ConnectionPlug, hands::HandsClientPlug, init::InitRenderPlug,
-            input::InputClientPlug, movement::MovementClientPlug, rotation::RotClientPlug,
+            camera::CameraPlug, connection::ConnectionPlug, hands::HandsClientPlug,
+            init::InitRenderPlug, input::InputClientPlug, movement::MovementClientPlug,
+            rotation::RotClientPlug,
         },
     },
     server::{
@@ -55,6 +56,7 @@ fn main() {
                 MovementClientPlug,
                 HandsClientPlug,
                 RotClientPlug,
+                CameraPlug,
             ));
         }
         _ => panic!("incorrect usage"),
