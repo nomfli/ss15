@@ -1,7 +1,9 @@
 use crate::{
     client::render::hands::{SendTryThrow, TryToGrabEvent},
-    shared::{messages::ClientMessages, resource::MovementInput},
+    make_log,
+    shared::{messages::ClientMessages, resource::MovementInput, utils::Loggable},
 };
+use std::{fmt::Debug, marker::Sync};
 
 use bevy::prelude::*;
 use bevy_renet::renet::*;
@@ -14,6 +16,24 @@ impl Plugin for ClientSendingPlug {
         app.add_systems(Update, send_grabbing);
         app.add_systems(Update, send_try_throw);
     }
+}
+
+#[derive(Event, Debug)]
+pub(crate) struct SendMessage<T: Into<u8> + Debug + Sync + Send + 'static + Copy> {
+    msg: ClientMessages,
+    channel: T,
+}
+
+pub(crate) fn sending_to_server<T: Into<u8> + Debug + Sync + Send + 'static + Copy>(
+    mut msg_ev: EventReader<SendMessage<T>>,
+    mut client: ResMut<RenetClient>,
+) {
+    msg_ev
+        .read()
+        .filter_map(|x| {
+            make_log!(bincode::serialize(&x.msg), "serilize msg").map(|y| (x.channel, y))
+        })
+        .map(|(channel, msg)| client.send_message(channel, msg));
 }
 
 pub(crate) fn client_send_movement(
@@ -30,7 +50,6 @@ pub(crate) fn client_send_movement(
     }
 }
 
-
 pub(crate) fn send_grabbing(
     mut reader: EventReader<TryToGrabEvent>,
     mut client: ResMut<RenetClient>,
@@ -44,7 +63,6 @@ pub(crate) fn send_grabbing(
         }
     }
 }
-
 
 pub(crate) fn send_try_throw(
     mut ev_reader: EventReader<SendTryThrow>,
