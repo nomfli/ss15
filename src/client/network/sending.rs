@@ -16,13 +16,14 @@ pub(crate) struct ClientSendingPlug;
 
 impl Plugin for ClientSendingPlug {
     fn build(&self, app: &mut App) {
+        app.add_event::<SendMessage<u8>>();
         app.add_systems(Update, send_resource::<MovementInput>);
         app.add_systems(Update, send_query::<Direction, PlayerEntity>);
         app.add_systems(Update, sending_event_to_server::<u8>);
     }
 }
 
-trait MakeMessage {
+pub(crate) trait MakeMessage {
     fn make_msg(&self) -> ClientMessages;
     fn channel(&self) -> u8;
 }
@@ -37,12 +38,12 @@ pub(crate) fn sending_event_to_server<T: Into<u8> + Debug + Sync + Send + 'stati
     mut msg_ev: EventReader<SendMessage<T>>,
     mut client: ResMut<RenetClient>,
 ) {
-    msg_ev
+    let _ = msg_ev
         .read()
         .filter_map(|x| {
             make_log!(bincode::serialize(&x.msg), "serilize event msg").map(|y| (x.channel, y))
         })
-        .map(|(channel, msg)| client.send_message(channel.into(), msg));
+        .for_each(|(channel, msg)| client.send_message(channel.into(), msg));
 }
 
 pub fn send_resource<T: Resource + MakeMessage>(resource: Res<T>, mut client: ResMut<RenetClient>) {
@@ -57,10 +58,13 @@ pub fn send_query<T: MakeMessage + Component, U: Component>(
     query: Query<&T, With<U>>,
     mut client: ResMut<RenetClient>,
 ) {
-    query.iter().map(|x| {
-        make_log!(bincode::serialize(&x.make_msg()), "serialize query")
-            .map(|y| client.send_message(x.channel(), y))
-    });
+    let _ = query
+        .iter()
+        .filter_map(|x| {
+            make_log!(bincode::serialize(&x.make_msg()), "serialize query")
+                .map(|y| (x.channel(), y))
+        })
+        .for_each(|(ch, msg)| client.send_message(ch, msg));
 }
 
 impl MakeMessage for MovementInput {

@@ -16,8 +16,6 @@ pub struct HandsClientPlug;
 impl Plugin for HandsClientPlug {
     fn build(&self, app: &mut App) {
         app.add_event::<ShouldGrab>();
-        app.add_event::<TryToGrabEvent>();
-        app.add_event::<SendTryThrow>();
         app.add_systems(Update, throw);
         app.add_systems(Update, change_hand);
         app.add_systems(Update, try_to_grab);
@@ -35,12 +33,6 @@ pub fn change_hand(
             hands.selected_hand = (hands.selected_hand + 1) % hands.all_hands.len();
         }
     }
-}
-
-#[derive(Event)]
-pub struct TryToGrabEvent {
-    pub can_be_grabbed: Entity, //server Entity
-    pub hand_idx: usize,
 }
 
 pub fn try_to_grab(
@@ -121,12 +113,6 @@ pub fn grab_event_handler(
             .remove::<Sprite>()
             .remove::<Transform>();
     }
-}
-
-#[derive(Event)]
-pub(crate) struct SendTryThrow {
-    pub hand_idx: usize,
-    pub where_throw: Vec2,
 }
 
 pub(crate) fn try_throw(

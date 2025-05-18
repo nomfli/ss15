@@ -4,6 +4,7 @@ use crate::{
         components::{Direction, Hand, Hands, PlayerEntity},
         resource::{Entities, Lobby},
         sprites::{SpriteName, Sprites},
+        utils::Loggable,
     },
 };
 use bevy::prelude::*;
