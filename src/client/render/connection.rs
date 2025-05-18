@@ -1,7 +1,10 @@
-use crate::shared::{
-    components::{Direction, Hand, Hands, PlayerEntity},
-    resource::{Entities, Lobby},
-    sprites::{SpriteName, Sprites},
+use crate::{
+    make_log,
+    shared::{
+        components::{Direction, Hand, Hands, PlayerEntity},
+        resource::{Entities, Lobby},
+        sprites::{SpriteName, Sprites},
+    },
 };
 use bevy::prelude::*;
 use bevy_renet::netcode::NetcodeClientTransport;
@@ -28,7 +31,6 @@ pub(crate) fn player_connected(
     mut commands: Commands,
     sprites: Res<Sprites>,
     mut ents: ResMut<Entities>,
-
 ) {
     for event in player_connected_ev.read() {
         let client_id = event.client_id;
@@ -40,14 +42,11 @@ pub(crate) fn player_connected(
         }
         lobby.players.insert(client_id, player_entity_id);
         ents.entities.insert(player_entity_id, event.ent_id);
-
-
     }
 }
 
 fn spawn_player_client(commands: &mut Commands, ent_id: Entity, sprites: &Res<Sprites>) -> Entity {
-
-    if let Some(sprite) = sprites.0.get("human") {
+    if let Some(sprite) = make_log!(sprites.0.get("human"), "find sprite in sprites") {
         let player_entity_id = commands
             .spawn(SpriteName("human".to_string()))
             .insert(sprite.clone())
