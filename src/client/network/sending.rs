@@ -38,7 +38,7 @@ pub(crate) fn sending_event_to_server<T: Into<u8> + Debug + Sync + Send + 'stati
     mut msg_ev: EventReader<SendMessage<T>>,
     mut client: ResMut<RenetClient>,
 ) {
-    let _ = msg_ev
+    msg_ev
         .read()
         .filter_map(|x| {
             make_log!(bincode::serialize(&x.msg), "serilize event msg").map(|y| (x.channel, y))
@@ -58,7 +58,7 @@ pub fn send_query<T: MakeMessage + Component, U: Component>(
     query: Query<&T, With<U>>,
     mut client: ResMut<RenetClient>,
 ) {
-    let _ = query
+    query
         .iter()
         .filter_map(|x| {
             make_log!(bincode::serialize(&x.make_msg()), "serialize query")
@@ -69,12 +69,12 @@ pub fn send_query<T: MakeMessage + Component, U: Component>(
 
 impl MakeMessage for MovementInput {
     fn make_msg(&self) -> ClientMessages {
-        return ClientMessages::MovementInput {
+        ClientMessages::MovementInput {
             up: self.up,
             down: self.down,
             left: self.left,
             right: self.right,
-        };
+        }
     }
     fn channel(&self) -> u8 {
         DefaultChannel::Unreliable.into()
@@ -86,6 +86,6 @@ impl MakeMessage for Direction {
         DefaultChannel::Unreliable.into()
     }
     fn make_msg(&self) -> ClientMessages {
-        ClientMessages::Direction(self.clone())
+        ClientMessages::Direction(*self)
     }
 }
