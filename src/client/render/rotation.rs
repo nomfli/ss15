@@ -1,18 +1,15 @@
 use crate::client::render::input::Mouse;
 use crate::shared::{
     components::{Direction, PlayerEntity, Speed},
-    messages::ClientMessages,
     resource::{Entities, MovementInput},
 };
 use bevy::prelude::*;
-use bevy_renet::renet::*;
 
 pub(crate) struct RotClientPlug;
 
 impl Plugin for RotClientPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, change_direction);
-        app.add_systems(Update, send_direction);
         app.add_systems(Update, add_rotation);
         app.add_systems(Update, render_rotation);
         app.add_event::<RotationClientEvent>();
@@ -34,7 +31,7 @@ pub(crate) fn change_direction(
         } else if input.right {
             *direction = Direction::Right;
         }
-        if speed.x * speed.x + speed.y * speed.y < 0.1 {
+        if speed.x * speed.x + speed.y * speed.y < 1.0 {
             let Some(cursor_pos) = mouse.cords else {
                 return;
             };
@@ -58,17 +55,6 @@ pub(crate) fn change_direction(
     }
 }
 
-pub(crate) fn send_direction(
-    mut client: ResMut<RenetClient>,
-    query: Query<(&PlayerEntity, &Direction)>,
-) {
-    for (_, dir) in query.iter() {
-        let Ok(direction_msg) = bincode::serialize(&ClientMessages::Direction(*dir)) else {
-            return;
-        };
-        client.send_message(DefaultChannel::Unreliable, direction_msg)
-    }
-}
 #[derive(Event)]
 pub(crate) struct RotationClientEvent {
     pub dir: Direction,
