@@ -1,11 +1,12 @@
 use crate::{
-
+    make_log,
     server::logic::hands::GrabAnsEvent,
     shared::{
         components::{Grabbable, Player, Speed},
         events::ThrowAnswerEvent,
         messages::ServerMessages,
         sprites::SpriteName,
+        utils::Loggable,
     },
 };
 use bevy::prelude::*;
@@ -26,6 +27,41 @@ impl Plugin for ServerSendPlug {
 #[derive(Event)]
 pub(crate) struct SendItems {
     pub client_id: u64,
+}
+
+pub(crate) trait ServerMessage: Send + Sync + 'static {
+    fn channel(&self) -> u8;
+    fn get_recipient(&self) -> MessageRecipient;
+    fn make_msg(&self) -> ServerMessages;
+}
+
+pub(crate) enum MessageRecipient {
+    Client(ClientId),
+    Broadcast,
+    Group(Vec<ClientId>),
+}
+
+pub(crate) fn send_msg<T: ServerMessage + Event>(
+    mut reader: EventReader<T>,
+    mut server: ResMut<RenetServer>,
+) {
+    reader.read().for_each(|event| {
+        make_log!(bincode::serialize(&event.make_msg()), "serialize event msg").map(|msg| {
+            match event.get_recipient() {
+                MessageRecipient::Client(val) => {
+                    server.send_message(val, event.channel(), msg);
+                }
+                MessageRecipient::Broadcast => {
+                    server.broadcast_message(event.channel(), msg);
+                }
+                MessageRecipient::Group(users) => {
+                    users
+                        .iter()
+                        .for_each(|user| server.send_message(*user, event.channel(), msg.clone()));
+                }
+            }
+        });
+    });
 }
 
 pub(crate) fn send_items(
@@ -74,7 +110,6 @@ pub(crate) fn send_speed(query: Query<(&Player, &Speed)>, mut server: ResMut<Ren
     }
 }
 
-
 pub(crate) fn send_throw_answer(
     mut server: ResMut<RenetServer>,
     mut throw_answer: EventReader<ThrowAnswerEvent>,
@@ -90,5 +125,3 @@ pub(crate) fn send_throw_answer(
         server.broadcast_message(DefaultChannel::Unreliable, throw_msg);
     }
 }
-
-
