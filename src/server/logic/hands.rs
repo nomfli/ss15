@@ -2,7 +2,6 @@ use crate::{
     server::network::sending::{MessageRecipient, SendServerMessage},
     shared::{
         components::{Grabbable, Hands},
-        events::ThrowAnswerEvent,
         messages::ServerMessages,
     },
 };
@@ -15,7 +14,6 @@ pub struct HandsServerPlug;
 impl Plugin for HandsServerPlug {
     fn build(&self, app: &mut App) {
         app.add_event::<GrabEvent>();
-        app.add_event::<GrabAnsEvent>();
         app.add_event::<ThrowEvent>();
         app.add_systems(Update, grab_answer_handler);
         app.add_systems(Update, throw_answer);
@@ -27,12 +25,6 @@ pub struct GrabEvent {
     pub i_want_grab: Entity,
     pub can_be_grabbed: Entity,
     pub hand_idx: usize,
-    pub client: ClientId,
-}
-
-#[derive(Event, Debug)]
-pub(crate) struct GrabAnsEvent {
-    pub can_be_grabbed: Entity,
     pub client: ClientId,
 }
 

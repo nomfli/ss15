@@ -1,8 +1,4 @@
-use crate::shared::{
-    components::{Player, Speed},
-    messages::ServerMessages,
-    resource::MovementInput,
-};
+use crate::shared::{components::Speed, resource::MovementInput};
 
 use bevy::prelude::*;
 use bevy_renet::renet::*;
@@ -27,7 +23,6 @@ impl Plugin for MovementServerPlug {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, move_players_system);
         app.add_systems(Update, velocity);
-        app.add_systems(Update, server_sync_players_movement::<Player>);
         app.init_resource::<Positions>();
     }
 }
@@ -76,31 +71,5 @@ pub(crate) fn velocity(time: Res<Time>, mut query: Query<(&mut Transform, &MaxSp
         if speed.y.abs() < 0.1 {
             speed.y = 0.0;
         }
-    }
-}
-
-pub(crate) fn server_sync_players_movement<T: Component + Debug + Id>(
-    mut server: ResMut<RenetServer>,
-    query: Query<(&Transform, &T)>,
-    mut players: ResMut<Positions>,
-) {
-    for (transform, object) in query.iter() {
-        players
-            .0
-            .insert(object.id(), transform.translation.truncate().into());
-    }
-    if let Ok(sync_message) = bincode::serialize(&ServerMessages::SendPositions(players.0.clone()))
-    {
-        server.broadcast_message(DefaultChannel::Unreliable, sync_message);
-    }
-}
-
-pub(crate) trait Id {
-    fn id(&self) -> u64;
-}
-
-impl Id for Player {
-    fn id(&self) -> u64 {
-        self.id
     }
 }

@@ -1,8 +1,8 @@
 use crate::{
     make_log,
+    server::logic::movement::Positions,
     shared::{
         components::{Grabbable, Player, Speed},
-        events::ThrowAnswerEvent,
         messages::ServerMessages,
         sprites::SpriteName,
         utils::Loggable,
@@ -19,6 +19,7 @@ impl Plugin for ServerSendPlug {
         app.add_systems(Update, init_items);
         app.add_systems(Update, send_speed);
         app.add_systems(Update, send_msg::<SendServerMessage>);
+        app.add_systems(Update, server_sync_players_movement);
         app.add_event::<SendItems>();
     }
 }
@@ -38,6 +39,7 @@ pub(crate) trait ServerMessage: Send + Sync + 'static {
 pub(crate) enum MessageRecipient {
     Client(ClientId),
     Broadcast,
+    #[allow(dead_code)]
     Group(Vec<ClientId>),
 }
 
@@ -114,5 +116,22 @@ pub(crate) fn send_speed(
             recipient: MessageRecipient::Client(player.id),
             msg: ServerMessages::Speed(*speed),
         });
+    });
+}
+
+pub(crate) fn server_sync_players_movement(
+    query: Query<(&Transform, &Player)>,
+    mut players: ResMut<Positions>,
+    mut writer: EventWriter<SendServerMessage>,
+) {
+    query.iter().for_each(|(transform, player)| {
+        players
+            .0
+            .insert(player.id, transform.translation.truncate().into());
+    });
+    writer.write(SendServerMessage {
+        channel: DefaultChannel::Unreliable.into(),
+        recipient: MessageRecipient::Broadcast,
+        msg: ServerMessages::SendPositions(players.0.clone()),
     });
 }
