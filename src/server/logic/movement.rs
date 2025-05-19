@@ -1,4 +1,3 @@
-
 use crate::shared::{
     components::{Player, Speed},
     messages::ServerMessages,
@@ -12,7 +11,6 @@ use std::{collections::HashMap, fmt::Debug};
 
 pub(crate) const MAX_MOVE_SPEED: f32 = 1000.0;
 pub(crate) const ACCELERATION: f32 = 100.0;
-
 
 #[derive(Resource, Debug, Default, Serialize, Deserialize)]
 pub(crate) struct Positions(pub HashMap<ClientId, [f32; 2]>);

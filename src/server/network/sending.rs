@@ -1,6 +1,5 @@
 use crate::{
     make_log,
-    server::logic::hands::GrabAnsEvent,
     shared::{
         components::{Grabbable, Player, Speed},
         events::ThrowAnswerEvent,
@@ -16,10 +15,10 @@ pub(crate) struct ServerSendPlug;
 
 impl Plugin for ServerSendPlug {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, send_items);
-        app.add_systems(Update, send_grab_answer);
+        app.add_event::<SendServerMessage>();
+        app.add_systems(Update, init_items);
         app.add_systems(Update, send_speed);
-        app.add_systems(Update, send_throw_answer);
+        app.add_systems(Update, send_msg::<SendServerMessage>);
         app.add_event::<SendItems>();
     }
 }
@@ -35,10 +34,30 @@ pub(crate) trait ServerMessage: Send + Sync + 'static {
     fn make_msg(&self) -> ServerMessages;
 }
 
+#[derive(Debug, Clone)]
 pub(crate) enum MessageRecipient {
     Client(ClientId),
     Broadcast,
     Group(Vec<ClientId>),
+}
+
+#[derive(Event, Debug, Clone)]
+pub(crate) struct SendServerMessage {
+    pub channel: u8,
+    pub recipient: MessageRecipient,
+    pub msg: ServerMessages,
+}
+
+impl ServerMessage for SendServerMessage {
+    fn channel(&self) -> u8 {
+        self.channel
+    }
+    fn make_msg(&self) -> ServerMessages {
+        self.msg.clone()
+    }
+    fn get_recipient(&self) -> MessageRecipient {
+        self.recipient.clone()
+    }
 }
 
 pub(crate) fn send_msg<T: ServerMessage + Event>(
@@ -64,64 +83,36 @@ pub(crate) fn send_msg<T: ServerMessage + Event>(
     });
 }
 
-pub(crate) fn send_items(
+pub(crate) fn init_items(
+    //init items for just connected player
     mut send_item: EventReader<SendItems>,
     items: Query<(&Transform, &SpriteName, Entity, &Grabbable), Without<Player>>,
-    mut server: ResMut<RenetServer>,
+    mut writer: EventWriter<SendServerMessage>,
 ) {
     for event in send_item.read() {
         for item in items.iter() {
             let (trans, name, ent, grabbable) = item;
             let Vec2 { x, y } = trans.translation.truncate();
-            let item_msg = bincode::serialize(&ServerMessages::AddItem((
-                [x, y],
-                name.clone(),
-                ent,
-                *grabbable,
-            )));
+            let item_msg = &ServerMessages::AddItem(([x, y], name.clone(), ent, *grabbable));
 
-            if let Ok(msg) = item_msg {
-                server.send_message(event.client_id, DefaultChannel::Unreliable, msg)
-            }
+            writer.write(SendServerMessage {
+                channel: DefaultChannel::Unreliable.into(),
+                recipient: MessageRecipient::Client(event.client_id),
+                msg: item_msg.clone(),
+            });
         }
     }
 }
 
-pub(crate) fn send_grab_answer(
-    mut server: ResMut<RenetServer>,
-    mut grab_ansewer: EventReader<GrabAnsEvent>,
+pub(crate) fn send_speed(
+    query: Query<(&Player, &Speed)>,
+    mut writer: EventWriter<SendServerMessage>,
 ) {
-    for event in grab_ansewer.read() {
-        let Ok(sync_message) = bincode::serialize(&ServerMessages::GrabAnswer(
-            event.can_be_grabbed,
-            event.client,
-        )) else {
-            continue;
-        };
-        server.broadcast_message(DefaultChannel::Unreliable, sync_message);
-    }
-}
-
-pub(crate) fn send_speed(query: Query<(&Player, &Speed)>, mut server: ResMut<RenetServer>) {
-    for (player, speed) in query.iter() {
-        if let Ok(speed_msg) = bincode::serialize(&ServerMessages::Speed(*speed)) {
-            server.send_message(player.id, DefaultChannel::Unreliable, speed_msg);
-        }
-    }
-}
-
-pub(crate) fn send_throw_answer(
-    mut server: ResMut<RenetServer>,
-    mut throw_answer: EventReader<ThrowAnswerEvent>,
-) {
-    for event in throw_answer.read() {
-        let Ok(throw_msg) = bincode::serialize(&ServerMessages::ThrowAnswer {
-            client_id: event.client,
-            where_throw: event.where_throw,
-            hand_idx: event.hand_idx,
-        }) else {
-            continue;
-        };
-        server.broadcast_message(DefaultChannel::Unreliable, throw_msg);
-    }
+    query.iter().for_each(|(player, speed)| {
+        writer.write(SendServerMessage {
+            channel: DefaultChannel::Unreliable.into(),
+            recipient: MessageRecipient::Client(player.id),
+            msg: ServerMessages::Speed(*speed),
+        });
+    });
 }

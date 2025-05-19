@@ -1,6 +1,10 @@
-use crate::shared::{
-    components::{Grabbable, Hands},
-    events::ThrowAnswerEvent,
+use crate::{
+    server::network::sending::{MessageRecipient, SendServerMessage},
+    shared::{
+        components::{Grabbable, Hands},
+        events::ThrowAnswerEvent,
+        messages::ServerMessages,
+    },
 };
 
 use bevy::prelude::*;
@@ -32,12 +36,11 @@ pub(crate) struct GrabAnsEvent {
     pub client: ClientId,
 }
 
-
 pub fn grab_answer_handler(
     mut grab_ev: EventReader<GrabEvent>,
     mut i_want_grab: Query<(&Transform, &mut Hands)>,
     can_be_grabbed: Query<(&Transform, &Grabbable)>,
-    mut send_grab_ev: EventWriter<GrabAnsEvent>,
+    mut send_grab_ev: EventWriter<SendServerMessage>,
     mut commands: Commands,
 ) {
     for event in grab_ev.read() {
@@ -51,13 +54,14 @@ pub fn grab_answer_handler(
                         < hands.all_hands[event.hand_idx].hand_len
                 {
                     {
-                        send_grab_ev.write(GrabAnsEvent {
-                            can_be_grabbed: event.can_be_grabbed,
-                            client: event.client,
+                        send_grab_ev.write(SendServerMessage {
+                            channel: DefaultChannel::Unreliable.into(),
+                            recipient: MessageRecipient::Broadcast,
+                            msg: ServerMessages::GrabAnswer(event.can_be_grabbed, event.client),
                         });
                         hands.all_hands[event.hand_idx].grab_ent = Some(event.can_be_grabbed);
                         commands
-                            .entity(event.can_be_grabbed)
+                            .entity(event.can_be_grabbed) //need to hide sprite not to remove
                             .remove::<Transform>()
                             .remove::<Sprite>();
                     };
@@ -77,7 +81,7 @@ pub(crate) struct ThrowEvent {
 
 pub(crate) fn throw_answer(
     mut throw_ev: EventReader<ThrowEvent>,
-    mut answer: EventWriter<ThrowAnswerEvent>,
+    mut answer: EventWriter<SendServerMessage>,
     mut i_want_throw: Query<(&Transform, &mut Hands)>,
     mut commands: Commands,
 ) {
@@ -100,10 +104,14 @@ pub(crate) fn throw_answer(
                 translation: Vec3::new(x, y, 0.0),
                 ..Default::default()
             });
-            answer.write(ThrowAnswerEvent {
-                hand_idx: event.selected_idx,
-                client: event.client,
-                where_throw: [x, y],
+            answer.write(SendServerMessage {
+                channel: DefaultChannel::Unreliable.into(),
+                recipient: MessageRecipient::Broadcast,
+                msg: ServerMessages::ThrowAnswer {
+                    client_id: event.client,
+                    where_throw: [x, y],
+                    hand_idx: event.selected_idx,
+                },
             });
         }
     }
