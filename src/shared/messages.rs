@@ -8,7 +8,7 @@ use bevy_renet::renet::ClientId;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, Serialize, Deserialize, Component)]
+#[derive(Debug, Serialize, Deserialize, Component, Clone)]
 pub enum ServerMessages {
     PlayerConnected {
         client_id: ClientId,
@@ -27,7 +27,6 @@ pub enum ServerMessages {
         hand_idx: usize,
         where_throw: [f32; 2],
     },
-
 }
 
 #[derive(Debug, Serialize, Deserialize, Component)]
