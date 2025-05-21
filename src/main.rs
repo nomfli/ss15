@@ -11,6 +11,7 @@ use crate::{
         render::{
             connection::ConnectionPlug, hands::HandsClientPlug, init::InitRenderPlug,
             input::InputClientPlug, movement::MovementClientPlug, rotation::RotClientPlug,
+            ui::player::UIHandsPlug,
         },
     },
     server::{
@@ -33,7 +34,7 @@ fn main() {
     let mut app = App::new();
     app.add_plugins((
         DefaultPlugins.set(LogPlugin {
-            level: Level::TRACE,
+            level: Level::INFO,
             ..Default::default()
         }),
         ResInitPlug,
@@ -64,6 +65,7 @@ fn main() {
                 MovementClientPlug,
                 HandsClientPlug,
                 RotClientPlug,
+                UIHandsPlug,
             ));
         }
         _ => panic!("incorrect usage"),
