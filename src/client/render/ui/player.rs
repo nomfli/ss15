@@ -19,6 +19,7 @@ impl Plugin for UIHandsPlug {
             Startup,
             init_hands_ui.after(player_connected).after(init_ui_root),
         );
+        app.add_systems(Update, update_hands_ui.after(init_ui_root));
     }
 }
 
@@ -88,7 +89,35 @@ pub(crate) fn init_hands_ui(
                     index: 0,
                 },
             ),
-            HandsUI(0),
+            HandsUI(1),
         ));
     });
+}
+
+pub(crate) fn update_hands_ui(
+    mut ui_query: Query<(&HandsUI, &mut ImageNode)>,
+    player_q: Query<&Hands, With<PlayerEntity>>,
+) {
+    for (ui, mut node) in ui_query.iter_mut() {
+        for hands in player_q.iter() {
+            println!("{:?}", hands.selected_hand);
+            if let Some(atlas) = &mut node.texture_atlas {
+                if hands.selected_hand == ui.0 {
+                    if atlas.index == 0 {
+                        atlas.index = 1;
+                    }
+                    if atlas.index == 2 {
+                        atlas.index = 3;
+                    }
+                } else {
+                    if atlas.index == 1 {
+                        atlas.index = 0;
+                    }
+                    if atlas.index == 3 {
+                        atlas.index = 2;
+                    }
+                }
+            }
+        }
+    }
 }

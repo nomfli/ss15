@@ -29,7 +29,7 @@ pub fn change_hand(
     mut hands_q: Query<(&mut Hands, &PlayerEntity)>,
 ) {
     for (mut hands, _) in hands_q.iter_mut() {
-        if keyboard.pressed(KeyCode::KeyX) {
+        if keyboard.just_pressed(KeyCode::KeyX) {
             hands.selected_hand = (hands.selected_hand + 1) % hands.all_hands.len();
         }
     }
