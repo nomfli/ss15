@@ -1,8 +1,9 @@
 use crate::{
-    client::render::input::Mouse,
+    client::{network::sending::SendMessage, render::input::Mouse},
     shared::{
         components::{Grabbable, Hands, PlayerEntity},
         events::ThrowAnswerEvent,
+        messages::ClientMessages,
         resource::{Entities, Lobby},
         sprites::{SpriteName, Sprites},
     },
@@ -15,8 +16,6 @@ pub struct HandsClientPlug;
 impl Plugin for HandsClientPlug {
     fn build(&self, app: &mut App) {
         app.add_event::<ShouldGrab>();
-        app.add_event::<TryToGrabEvent>();
-        app.add_event::<SendTryThrow>();
         app.add_systems(Update, throw);
         app.add_systems(Update, change_hand);
         app.add_systems(Update, try_to_grab);
@@ -30,25 +29,18 @@ pub fn change_hand(
     mut hands_q: Query<(&mut Hands, &PlayerEntity)>,
 ) {
     for (mut hands, _) in hands_q.iter_mut() {
-        if keyboard.pressed(KeyCode::KeyX) {
+        if keyboard.just_pressed(KeyCode::KeyX) {
             hands.selected_hand = (hands.selected_hand + 1) % hands.all_hands.len();
         }
     }
 }
-
-#[derive(Event)]
-pub struct TryToGrabEvent {
-    pub can_be_grabbed: Entity, //server Entity
-    pub hand_idx: usize,
-}
-
 
 pub fn try_to_grab(
     i_want_grab: Query<(&Hands, &PlayerEntity)>,
     can_be_grabed: Query<(&Transform, &Sprite, Entity, &Grabbable)>,
     entities: Res<Entities>,
     mouse_input: Res<Mouse>,
-    mut writer: EventWriter<TryToGrabEvent>,
+    mut writer: EventWriter<SendMessage<u8>>,
 ) {
     for (hands, _) in i_want_grab.iter() {
         let selected_idx = hands.selected_hand;
@@ -75,9 +67,12 @@ pub fn try_to_grab(
                     panic!("problem with bimap entities can't find entity");
                 };
 
-                writer.write(TryToGrabEvent {
-                    can_be_grabbed: *server_ent,
-                    hand_idx: selected_idx,
+                writer.write(SendMessage {
+                    channel: DefaultChannel::Unreliable.into(),
+                    msg: ClientMessages::Grab {
+                        can_be_grabbed: *server_ent,
+                        hand_idx: selected_idx,
+                    },
                 });
             }
         }
@@ -120,16 +115,10 @@ pub fn grab_event_handler(
     }
 }
 
-#[derive(Event)]
-pub(crate) struct SendTryThrow {
-    pub hand_idx: usize,
-    pub where_throw: Vec2,
-}
-
 pub(crate) fn try_throw(
     keyboard: Res<ButtonInput<KeyCode>>,
     query: Query<(&PlayerEntity, &Hands)>,
-    mut send_ev: EventWriter<SendTryThrow>,
+    mut send_ev: EventWriter<SendMessage<u8>>,
     mouse_input: Res<Mouse>,
 ) {
     for (_, hands) in query.iter() {
@@ -141,9 +130,12 @@ pub(crate) fn try_throw(
             return;
         };
         if keyboard.pressed(KeyCode::KeyQ) {
-            send_ev.write(SendTryThrow {
-                hand_idx,
-                where_throw,
+            send_ev.write(SendMessage {
+                msg: ClientMessages::Throw {
+                    selected_idx: hand_idx,
+                    where_throw,
+                },
+                channel: DefaultChannel::Unreliable.into(),
             });
         }
     }

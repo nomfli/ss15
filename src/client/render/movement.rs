@@ -41,7 +41,6 @@ pub(crate) fn change_position(
     }
 }
 
-
 #[derive(Default, Debug, Clone, Event)]
 pub(crate) struct SpeedEvent(pub Speed);
 
@@ -56,4 +55,3 @@ pub(crate) fn change_speed(
         }
     }
 }
-

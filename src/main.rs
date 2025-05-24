@@ -1,3 +1,4 @@
+use bevy::log::*;
 use bevy::prelude::*;
 
 mod client;
@@ -8,8 +9,9 @@ use crate::{
     client::{
         network::{init::ClientInitPlug, receive::ClientNetworkPlug, sending::ClientSendingPlug},
         render::{
-            connection::ConnectionPlug, hands::HandsClientPlug, init::InitRenderPlug,
-            input::InputClientPlug, movement::MovementClientPlug, rotation::RotClientPlug,
+            camera::CameraPlug, connection::ConnectionPlug, hands::HandsClientPlug,
+            init::InitRenderPlug, input::InputClientPlug, movement::MovementClientPlug,
+            rotation::RotClientPlug, ui::player::UIHandsPlug,
         },
     },
     server::{
@@ -22,15 +24,30 @@ use crate::{
             update_server_system::UpdateServerPlug,
         },
     },
+    shared::{events::SharedEvents, resource::ResInitPlug, sprites::SpritesPlug},
 };
-
-use crate::shared::{events::SharedEvents, resource::ResInitPlug, sprites::SpritesPlug};
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let exec_type = args[1].as_str();
     let mut app = App::new();
-    app.add_plugins((DefaultPlugins, ResInitPlug, SpritesPlug, SharedEvents));
+    app.add_plugins((
+        DefaultPlugins
+            .set(LogPlugin {
+                level: Level::INFO,
+                ..default()
+            })
+            .set(WindowPlugin {
+                primary_window: Some(Window {
+                    title: "Space Station 15".to_string(),
+                    ..default()
+                }),
+                ..default()
+            }),
+        ResInitPlug,
+        SpritesPlug,
+        SharedEvents,
+    ));
     match exec_type {
         "server" => {
             app.add_plugins((
@@ -55,6 +72,8 @@ fn main() {
                 MovementClientPlug,
                 HandsClientPlug,
                 RotClientPlug,
+                UIHandsPlug,
+                CameraPlug,
             ));
         }
         _ => panic!("incorrect usage"),
