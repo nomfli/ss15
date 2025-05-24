@@ -172,7 +172,7 @@ pub(crate) fn update_hands_ui(
 }
 
 pub(crate) fn handle_grabbed_items_ui(
-    ui_q: Query<(Entity, &Node, &GrabbedObjUI)>,
+    ui_q: Query<(Entity, &GrabbedObjUI), With<Node>>,
     player: Query<&Hands, With<PlayerEntity>>,
     sprite_q: Query<&SpriteName>,
     sprites: Res<Sprites>,
@@ -183,9 +183,8 @@ pub(crate) fn handle_grabbed_items_ui(
     };
 
     let selected_hand = hands.selected_hand;
-    println!("{:?}", selected_hand);
 
-    for (ent, node, ui) in ui_q.iter() {
+    for (ent, ui) in ui_q.iter() {
         if ui.0 != selected_hand {
             continue;
         }
